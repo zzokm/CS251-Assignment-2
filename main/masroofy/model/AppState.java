@@ -1,4 +1,5 @@
 package masroofy.model;
 
-public class AppState {}
+public class AppState {
+}
 
