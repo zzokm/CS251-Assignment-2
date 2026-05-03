@@ -4,10 +4,10 @@
 **Team: S26**
 | ID | Name | Email | Mobile |
 | :--- | :--- | :--- | :--- |
-| 20242447 | Yehia Hassan Abdelmoaty | 20242447@stud.fci-cu.edu.eg | 01205309575 |
-| 20240794 | Noha Mohamed Ahmed | 20240794@stud.fci-cu.edu.eg | 01007021975 |
-| 20240759 | Jana Ahmed Farahat Hassan | 20240759@stud.fci-cu.edu.eg | 01281727773 |
-| 20240650 | Hana Khaled Abdelhamed | 20240650@stud.fci-cu.edu.eg | 01060820155 |
+| 20242447 | Yehia Hassan Abdelmoaty | 20****47@stud.fci-cu.edu.eg | 0120******5 |
+| 20240794 | Noha Mohamed Ahmed | 20****94@stud.fci-cu.edu.eg | 0100******5 |
+| 20240759 | Jana Ahmed Farahat Hassan | 20****59@stud.fci-cu.edu.eg | 0128******3 |
+| 20240650 | Hana Khaled Abdelhamed | 20****50@stud.fci-cu.edu.eg | 0106******5 |
 **Date:** April 2026
 
 ---
@@ -118,6 +118,8 @@ flowchart LR
     AppServices -.->|Triggers / Asynchronous Interaction| Alerts
 ```
 
+![Architectural diagram (export)](architecture.png)
+
 ---
 
 ### II. Class Diagram(s)
@@ -187,6 +189,8 @@ classDiagram
     Category "1" -- "*" Expense : groups
 ```
 
+![Class diagram (export)](class.png)
+
 ---
 
 ### III. Class Descriptions
@@ -234,6 +238,8 @@ sequenceDiagram
     end
 ```
 
+![Sequence: Set initial budget cycle (export)](image.png)
+
 #### 2. Log Daily Expense (US #2)
 This covers the "Rapid Entry" requirement (Quick-add).
 
@@ -255,6 +261,8 @@ sequenceDiagram
     ExpenseManager-->>QuickEntryUI: 6: showSuccessMessage()
 ```
 
+![Sequence: Log daily expense (export)](seq2.png)
+
 #### 3. Automatic Midnight Rollover (US #4 / FR-4)
 This shows the system automatically recalculating the limit.
 ```mermaid
@@ -274,6 +282,8 @@ sequenceDiagram
     DatabaseHelper-->>CycleController: 5.1: success
 ```
 
+![Sequence: Midnight rollover (export)](seq3.png)
+
 #### 4. Threshold Alert (80% Spending)
 This shows the logic for triggering the notification alert.
 ```mermaid
@@ -292,6 +302,8 @@ sequenceDiagram
     end
 ```
 
+![Sequence: Threshold alert (export)](seq4.png)
+
 #### 5. View History & Filters
 Based on the Data Dictionary entry for "Filter Selection".
 ```mermaid
@@ -308,6 +320,8 @@ sequenceDiagram
     TransactionManager-->>HistoryUI: 4: updateListDisplay(dataList)
     HistoryUI-->>Student: 5: renderHistoryRows()
 ```
+
+![Sequence: View history and filters (export)](seq5.png)
 
 #### 6. Set/Verify Privacy PIN (US #11)
 Matches the "LocalAuth" class and the "PIN Field" data entry.
@@ -330,6 +344,8 @@ sequenceDiagram
         AuthManager-->>AuthUI: 4a: showAccessDenied()
     end
 ```
+
+![Sequence: Privacy PIN (export)](seq6.png)
 
 ---
 
@@ -389,6 +405,8 @@ stateDiagram-v2
     Dashboard --> AppExit : close app
     AppExit --> [*]
 ```
+
+![State diagram (export)](state.png)
 
 ---
 
