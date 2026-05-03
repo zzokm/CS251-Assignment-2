@@ -8,6 +8,7 @@ This file assigns **exact implementation responsibilities** per member based on 
 - **Traceability**: each user story must map to sequence diagrams in `docs/Masroofy_SDS_Full.md` / `diagrams/DIAGRAMS.md` and to real code method names (Class–Sequence Usage Table).
 - **Javadoc**: every class and every public method must have meaningful Javadoc.
 - **Deadline focus**: implement the simplest console flows that satisfy acceptance criteria; avoid optional refactors.
+- **No tests**: skip test writing (deadline). Do quick manual checks per flow instead.
 
 ---
 
@@ -39,7 +40,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Add/update a sequence diagram for “Dashboard → Generate spending insights”.
   - Update Class–Sequence table with exact method names and code locations.
-- **Tests**
+- **Manual checks**
   - Aggregation correctness with multiple categories; zero-expense case.
 - **Javadoc**
   - Document calculation formula and rounding rules.
@@ -62,7 +63,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Add sequence diagram(s) for Edit/Delete (can be one diagram with `alt`).
   - Update Class–Sequence table entries.
-- **Tests**
+- **Manual checks**
   - Edit updates totals; delete removes record; invalid ID handling.
 - **Javadoc**
   - Explain recalculation side-effects and validations.
@@ -85,7 +86,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
   - Existing sequence diagram exists (but may be mislabeled in SDS as US #11). Either:
     - fix the label in diagrams/SDS, or
     - add a US #12-specific diagram and map it in the Class–Sequence table.
-- **Tests**
+- **Manual checks**
   - Hash verify success/fail; lockout after 3 failures; lockout expiry.
 - **Javadoc**
   - Document lockout rule and security constraints.
@@ -107,7 +108,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Ensure existing “Log Expense” sequence diagram matches final class/method names.
   - Update Class–Sequence table with exact names + code location.
-- **Tests**
+- **Manual checks**
   - Add expense persists; invalid input rejected.
 - **Javadoc**
   - Document validation and timestamp behavior.
@@ -125,7 +126,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Update existing threshold sequence diagram to include “already alerted” flag storage (or add a small extension).
   - Update Class–Sequence table.
-- **Tests**
+- **Manual checks**
   - Crossing 80% triggers once; crossing 100% triggers exhausted message.
 - **Javadoc**
   - Document thresholds and one-time alert rule.
@@ -145,8 +146,8 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Add sequence diagram for “App launch → Load state → route to Setup/Dashboard/Auth”.
   - Update Class–Sequence table.
-- **Tests**
-  - Integration-style test (or manual script): add expense → restart → expense still present.
+- **Manual checks**
+  - Add expense → restart app → expense still present.
 - **Javadoc**
   - Document persistence guarantees and failure handling.
 
@@ -171,7 +172,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Add sequence diagram for “Open dashboard → compute safe daily limit”.
   - Update Class–Sequence table.
-- **Tests**
+- **Manual checks**
   - Final day handling; remainingDays computation edge cases.
 - **Javadoc**
   - Document date arithmetic assumptions.
@@ -187,7 +188,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Add sequence diagram for “History → fetch list → display”.
   - Update Class–Sequence table.
-- **Tests**
+- **Manual checks**
   - Sorting correctness; empty list.
 - **Javadoc**
   - Document sort order and formatting.
@@ -209,7 +210,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Add a sequence diagram for “Reset cycle” (currently missing/mislabeled in SDS).
   - Update Class–Sequence table (and fix US numbering mismatch in SDS if needed).
-- **Tests**
+- **Manual checks**
   - Reset actually clears; cancel does nothing.
 - **Javadoc**
   - Document exactly what data is cleared vs retained.
@@ -232,7 +233,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Ensure existing setup sequence diagram matches final names or update it.
   - Update Class–Sequence table.
-- **Tests**
+- **Manual checks**
   - Invalid allowance rejected; invalid date range rejected.
 - **Javadoc**
   - Document validation rules and date semantics.
@@ -252,7 +253,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Update existing rollover diagram to match console trigger (on app open).
   - Update Class–Sequence table.
-- **Tests**
+- **Manual checks**
   - Simulate date advancement; overspending scenario.
 - **Javadoc**
   - Document rollover trigger points and assumptions.
@@ -269,7 +270,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 - **Traceability deliverables**
   - Ensure existing “View History & Filters” diagram covers date range; update if needed.
   - Update Class–Sequence table.
-- **Tests**
+- **Manual checks**
   - Category-only filter; date-only filter; combined filter; empty results.
 - **Javadoc**
   - Document filtering rules.

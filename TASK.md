@@ -94,77 +94,50 @@ To reduce risk/complexity and ship within 2 days, we will use **file-based JSON 
 
 ---
 
-## 3) Proposed project structure (Java Console, Maven style)
+## 3) Proposed project structure (Java Console, simplified folders)
 
 Keep packages aligned with responsibilities so the TA can find diagram interactions quickly.
 
+**Folder convention:** keep the Java package root at `main/masroofy/` and use a simple structure: `ui/` (console I/O), `core/` (use-cases), `model/` (POJOs), `storage/` (JSON).
+
 ```
 Masroofy/
-  README.md
-  TASK.md
-  docs/                         # given docs (SRS/SDS/assignment)
-  diagrams/                     # given diagrams + exports
-  src/
-    main/
-      java/
-        masroofy/
-          Main.java
-          app/
-            ConsoleApp.java
-            ui/
-              MenuView.java
-              SetupView.java
-              DashboardView.java
-              ExpenseEntryView.java
-              HistoryView.java
-              SettingsView.java
-              AuthView.java
-            controller/
-              CycleController.java
-              ExpenseController.java
-              DashboardController.java
-              AuthController.java
-              NotificationController.java
-          domain/
-            model/
-              Cycle.java
-              Expense.java
-              Category.java
-              UserSettings.java
-            service/
-              CycleService.java
-              ExpenseService.java
-              DashboardService.java
-              AuthService.java
-              NotificationService.java
-              TimeService.java
-          persistence/
-            file/
-              JsonStore.java
-              AppState.java
-            repository/
-              CycleRepository.java
-              ExpenseRepository.java
-              CategoryRepository.java
-              SettingsRepository.java
-          util/
-            InputValidator.java
-            PasswordHasher.java
-            DateTimeProvider.java
-            Money.java
-  src/
-    test/
-      java/
-        masroofy/...
-  generated-docs/               # output of Javadoc (HTML) to include in submission zip
+├─ README.md
+├─ TASK.md
+├─ WORK_ALLOCATION.md
+├─ docs/                         # given docs (SRS/SDS/assignment)
+├─ diagrams/                     # given diagrams + exports
+├─ data/                         # runtime JSON persistence (created on first run)
+├─ main/
+│  └─ masroofy/
+│     ├─ Main.java
+│     ├─ ui/
+│     │  ├─ DashboardUI.java
+│     │  ├─ HistoryUI.java
+│     │  ├─ MenuUI.java
+│     │  ├─ SettingsUI.java
+│     │  └─ SetupUI.java
+│     ├─ core/
+│     │  ├─ AuthManager.java
+│     │  ├─ CycleManager.java
+│     │  ├─ ExpenseManager.java
+│     │  └─ ReportManager.java
+│     ├─ model/
+│     │  ├─ AppState.java
+│     │  ├─ Category.java
+│     │  ├─ Cycle.java
+│     │  ├─ Expense.java
+│     │  └─ UserSettings.java
+│     └─ storage/
+│        ├─ JsonStore.java
+│        └─ Paths.java
+└─ generated-docs/               # output of Javadoc (HTML) to include in submission zip
 ```
 
 **Notes**
 
-- Keep class names close to SDS names when possible (e.g., `CycleController`, `DatabaseHelper/Database`).
-- If SDS uses different names (`ExpenseManager`, `Transaction`), we must either:
-  - implement those exact classes/methods, OR
-  - update the diagrams/SDS to match the final code naming (recommended to avoid mismatch penalties).
+- This is intentionally “simple and student-friendly”, not production-grade.
+- For traceability, put the methods referenced by sequence diagrams inside `core/*Manager` and reference those in the Class–Sequence table (or update diagrams to match these names).
 
 ---
 
@@ -434,21 +407,7 @@ We must produce a **Class–Sequence Usage Table** that is “TA-friendly”. Ta
 
 ---
 
-## 9) Testing plan (console-friendly but still valuable)
-
-Minimum recommended:
-
-- Unit tests for:
-  - daily limit calculation
-  - threshold detection
-  - rollover detection
-  - PIN hashing + lockout policy
-- Integration tests for persistence:
-  - create cycle → add expense → restart → data is still correct
-
----
-
-## 10) GitHub & contribution evidence tasks
+## 9) GitHub & contribution evidence tasks
 
 - Branch strategy:
   - `main` protected (optional)
@@ -462,7 +421,7 @@ Minimum recommended:
 
 ---
 
-## 11) Submission packaging tasks (zip content)
+## 10) Submission packaging tasks (zip content)
 
 Prepare one zip containing:
 
@@ -478,7 +437,7 @@ Prepare one zip containing:
 
 ---
 
-## 12) Bonus recommendations backlog (pick items, then negotiate with TA)
+## 11) Bonus recommendations backlog (pick items, then negotiate with TA)
 
 Bonus work **must be explicitly out of scope** of the SDS diagrams (allowed to go off-script).  
 Choose bonuses that are impressive but still realistic for a console app.
@@ -530,7 +489,7 @@ Choose bonuses that are impressive but still realistic for a console app.
 
 ---
 
-## 13) Work breakdown (who does what) — suggested split for 4 members
+## 12) Work breakdown (who does what) — suggested split for 4 members
 
 Split by modules so each member has meaningful commits.
 
@@ -548,7 +507,7 @@ Everyone contributes:
 
 ---
 
-## 14) “Definition of Done” (final readiness checklist)
+## 13) “Definition of Done” (final readiness checklist)
 
 - All **US #1–#12** implemented and demoable end-to-end in console.
 - Data persists and reloads correctly.
