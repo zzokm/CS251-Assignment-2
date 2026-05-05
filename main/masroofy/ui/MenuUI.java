@@ -1,27 +1,42 @@
 package masroofy.ui;
 
 import masroofy.core.CycleManager;
+import masroofy.core.ExpenseManager;
 import masroofy.model.AppState;
+import masroofy.model.Category;
+import masroofy.model.Expense;
 import java.time.LocalDate;
 import java.util.Scanner;
 
 /** Main console menu and startup router. */
 public class MenuUI {
   private final CycleManager cycleManager;
+  private final ExpenseManager expenseManager;
   private final SetupUI setupUI;
   private final HistoryUI historyUI;
 
   /** Creates the menu with default dependencies. */
   public MenuUI() {
-    this(new CycleManager(), new SetupUI(), new HistoryUI());
+    this(new CycleManager(), new ExpenseManager(), new SetupUI(), new HistoryUI());
   }
 
   /** Creates the menu with injected dependencies. */
   public MenuUI(CycleManager cycleManager, SetupUI setupUI, HistoryUI historyUI) {
+    this(cycleManager, new ExpenseManager(), setupUI, historyUI);
+  }
+
+  /** Creates the menu with injected dependencies. */
+  public MenuUI(
+      CycleManager cycleManager,
+      ExpenseManager expenseManager,
+      SetupUI setupUI,
+      HistoryUI historyUI) {
     if (cycleManager == null) throw new IllegalArgumentException("cycleManager cannot be null");
+    if (expenseManager == null) throw new IllegalArgumentException("expenseManager cannot be null");
     if (setupUI == null) throw new IllegalArgumentException("setupUI cannot be null");
     if (historyUI == null) throw new IllegalArgumentException("historyUI cannot be null");
     this.cycleManager = cycleManager;
+    this.expenseManager = expenseManager;
     this.setupUI = setupUI;
     this.historyUI = historyUI;
   }
@@ -52,13 +67,18 @@ public class MenuUI {
     while (running) {
       System.out.println();
       System.out.println("Menu");
-      System.out.println("1. Filter transaction history");
+      System.out.println("1. Add expense");
+      System.out.println("2. Filter transaction history");
       System.out.println("0. Exit");
       System.out.print("Choose: ");
 
       String choice = scanner.nextLine().trim();
       switch (choice) {
         case "1":
+          showAddExpense(state, scanner);
+          showRolloverStatus(state);
+          break;
+        case "2":
           historyUI.showFilteredHistory(state, scanner);
           break;
         case "0":
@@ -67,6 +87,38 @@ public class MenuUI {
         default:
           System.out.println("Unknown option.");
       }
+    }
+  }
+
+  private void showAddExpense(AppState state, Scanner scanner) {
+    System.out.println();
+    System.out.println("Add Expense");
+    System.out.println("-----------");
+    printCategories(state);
+
+    try {
+      System.out.print("Category id: ");
+      int categoryId = Integer.parseInt(scanner.nextLine().trim());
+
+      System.out.print("Amount (EGP): ");
+      double amount = Double.parseDouble(scanner.nextLine().trim());
+
+      System.out.print("Note (optional): ");
+      String note = scanner.nextLine();
+
+      Expense expense = expenseManager.addExpense(state, categoryId, amount, note);
+      System.out.printf("Expense #%d saved.%n", expense.getId());
+    } catch (NumberFormatException e) {
+      System.out.println("Category id and amount must be valid numbers.");
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  private void printCategories(AppState state) {
+    System.out.println("Categories:");
+    for (Category category : state.getCategories()) {
+      System.out.printf("%d. %s%n", category.getId(), category.getName());
     }
   }
 

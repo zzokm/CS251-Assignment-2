@@ -19,6 +19,32 @@
    */
   public class ExpenseManager {
 
+    /**
+     * Adds a new expense transaction and saves it immediately.
+     *
+     * @param state current application state
+     * @param categoryId category id for the expense
+     * @param amount spent amount
+     * @param note optional note
+     * @return the newly saved expense
+     */
+    public Expense addExpense(AppState state, int categoryId, double amount, String note) {
+      if (state == null) throw new IllegalArgumentException("state cannot be null");
+      if (amount <= 0) throw new IllegalArgumentException("Amount must be > 0");
+      if (!categoryExists(state, categoryId)) throw new IllegalArgumentException("Invalid category");
+
+      Expense expense =
+          new Expense(
+              state.allocateExpenseId(),
+              categoryId,
+              amount,
+              System.currentTimeMillis(),
+              normalizeNote(note));
+      state.getExpenses().add(expense);
+      saveNow(state);
+      return expense;
+    }
+
     public Expense findExpenseById(AppState state, long expenseId) {
       if (state == null) throw new IllegalArgumentException("state cannot be null");
       for (Expense e : state.getExpenses()) {
@@ -145,6 +171,11 @@
       } catch (DateTimeParseException e) {
         throw new IllegalArgumentException(label + " must use yyyy-MM-dd format.", e);
       }
+    }
+
+    private static String normalizeNote(String note) {
+      if (note == null) return "";
+      return note.trim();
     }
 
     private static void saveNow(AppState state) {
