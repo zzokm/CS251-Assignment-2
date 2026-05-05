@@ -16,6 +16,7 @@ data/
 .DS_Store
 Thumbs.db
 .idea/
+web/
 *.iml
 .vscode/
 

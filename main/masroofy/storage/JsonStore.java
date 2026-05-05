@@ -1,5 +1,6 @@
 package masroofy.storage;
 
+import masroofy.model.AppState;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -24,6 +25,26 @@ import java.util.Map;
  */
 public final class JsonStore {
   private JsonStore() {}
+
+  /**
+   * Loads application state from disk.
+   *
+   * <p>If the state file is missing or invalid, returns a new state with seeded categories.
+   */
+  public static AppState loadState() {
+    return AppState.fromJsonObject(loadObject());
+  }
+
+  /**
+   * Saves application state to disk (atomic replace).
+   *
+   * @param state state to persist
+   * @throws IOException if saving fails
+   */
+  public static void saveState(AppState state) throws IOException {
+    if (state == null) throw new IllegalArgumentException("state cannot be null");
+    saveObject(state.toJsonObject());
+  }
 
   /**
    * Loads a JSON value from disk.
