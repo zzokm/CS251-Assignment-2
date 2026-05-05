@@ -289,5 +289,45 @@ public class CycleManager {
       throw new IllegalStateException("Failed to save state", e);
     }
   }
+
+
+  /**
+   * Resets the current budget cycle (US #11). Jana
+   *
+   * <p>Clears all expenses and creates a new cycle with the given allowance and dates.
+   * Changes are saved immediately.
+   *
+   * @param state application state
+   * @param newAllowance new cycle allowance
+   * @param startDate start date (yyyy-MM-dd)
+   * @param endDate end date (yyyy-MM-dd)
+   */
+  public void resetCycle(AppState state, double newAllowance, String startDate, String endDate) {
+    validateState(state);
+
+    LocalDate start = parseDate(startDate, "start date");
+    LocalDate end = parseDate(endDate, "end date");
+
+    validateCycleInput(newAllowance, start, end);
+
+    // Clear all existing expenses
+    state.getExpenses().clear();
+
+    // Create new cycle
+    Cycle newCycle = new Cycle(
+            System.currentTimeMillis(),
+            newAllowance,
+            startDate,
+            endDate
+    );
+
+    newCycle.setLastCalculatedDate(startDate);
+
+    state.setActiveCycle(newCycle);
+
+    saveNow(state);
+  }
+
+
 }
 
