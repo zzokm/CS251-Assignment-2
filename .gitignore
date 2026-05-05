@@ -1,0 +1,21 @@
+# Java build outputs
+*.class
+
+# Common build directories
+bin/
+out/
+target/
+
+# Generated docs
+generated-docs/
+
+# Runtime data (local persistence)
+data/
+
+# OS / editor / IDE files
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
+
