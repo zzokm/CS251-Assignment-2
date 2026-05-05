@@ -1,5 +1,8 @@
 package masroofy.model;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -63,6 +66,39 @@ public class Expense {
 
   public void setNote(String note) {
     this.note = note;
+  }
+
+  /**
+   * Returns the transaction date in the computer's local time zone.
+   *
+   * <p>US #9 uses this date for inclusive date-range filtering.
+   */
+  public LocalDate getLocalDate() {
+    return Instant.ofEpochMilli(timestampMillis).atZone(ZoneId.systemDefault()).toLocalDate();
+  }
+
+  /**
+   * Checks whether this transaction belongs to the requested category.
+   *
+   * @param requestedCategoryId category id to match, or {@code null} to accept any category
+   * @return true if this expense matches the requested category filter
+   */
+  public boolean matchesCategory(Integer requestedCategoryId) {
+    return requestedCategoryId == null || categoryId == requestedCategoryId;
+  }
+
+  /**
+   * Checks whether this transaction date is inside an inclusive date range.
+   *
+   * @param fromDate first accepted date, or {@code null} for no lower bound
+   * @param toDate last accepted date, or {@code null} for no upper bound
+   * @return true if this expense falls inside the requested date range
+   */
+  public boolean isWithinDateRange(LocalDate fromDate, LocalDate toDate) {
+    LocalDate transactionDate = getLocalDate();
+    if (fromDate != null && transactionDate.isBefore(fromDate)) return false;
+    if (toDate != null && transactionDate.isAfter(toDate)) return false;
+    return true;
   }
 
   public Map<String, Object> toJsonObject() {

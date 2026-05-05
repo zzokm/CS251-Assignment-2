@@ -5,6 +5,8 @@
   import masroofy.model.Expense;
   import masroofy.storage.JsonStore;
   import java.io.IOException;
+  import java.time.LocalDate;
+  import java.time.format.DateTimeParseException;
   import java.util.Iterator;
   import java.util.ArrayList;
   import java.util.List;
@@ -37,6 +39,56 @@
       List<Expense> sorted = new ArrayList<>(state.getExpenses());
       sorted.sort((a, b) -> Long.compare(b.getTimestampMillis(), a.getTimestampMillis()));
       return sorted;
+    }
+
+    /**
+     * Filters transaction history by optional category and optional inclusive date range (US #9).
+     *
+     * <p>Passing {@code null} for a filter means "all" for that field. Results are returned newest
+     * first, matching the normal history order.
+     *
+     * @param state current application state
+     * @param categoryId category id to match, or {@code null} for all categories
+     * @param fromDate first accepted transaction date, or {@code null} for no lower bound
+     * @param toDate last accepted transaction date, or {@code null} for no upper bound
+     * @return matching transactions sorted descending by timestamp
+     */
+    public List<Expense> filterHistory(
+        AppState state, Integer categoryId, LocalDate fromDate, LocalDate toDate) {
+      if (state == null) throw new IllegalArgumentException("state cannot be null");
+      if (categoryId != null && !categoryExists(state, categoryId)) {
+        throw new IllegalArgumentException("Invalid category");
+      }
+      if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
+        throw new IllegalArgumentException("From date must be before or equal to to date.");
+      }
+
+      List<Expense> filtered = new ArrayList<>();
+      for (Expense e : state.getExpenses()) {
+        if (e.matchesCategory(categoryId) && e.isWithinDateRange(fromDate, toDate)) {
+          filtered.add(e);
+        }
+      }
+      filtered.sort((a, b) -> Long.compare(b.getTimestampMillis(), a.getTimestampMillis()));
+      return filtered;
+    }
+
+    /**
+     * Parses optional ISO dates and filters transaction history by category/date range (US #9).
+     *
+     * @param state current application state
+     * @param categoryId category id to match, or {@code null} for all categories
+     * @param fromDateIso first accepted date in {@code yyyy-MM-dd}, blank/null for no lower bound
+     * @param toDateIso last accepted date in {@code yyyy-MM-dd}, blank/null for no upper bound
+     * @return matching transactions sorted descending by timestamp
+     */
+    public List<Expense> filterHistory(
+        AppState state, Integer categoryId, String fromDateIso, String toDateIso) {
+      return filterHistory(
+          state,
+          categoryId,
+          parseOptionalDate(fromDateIso, "from date"),
+          parseOptionalDate(toDateIso, "to date"));
     }
 
     public void editExpense(
@@ -84,6 +136,15 @@
         if (c.getId() == categoryId) return c.getName();
       }
       return "Unknown";
+    }
+
+    private static LocalDate parseOptionalDate(String value, String label) {
+      if (value == null || value.trim().isEmpty()) return null;
+      try {
+        return LocalDate.parse(value.trim());
+      } catch (DateTimeParseException e) {
+        throw new IllegalArgumentException(label + " must use yyyy-MM-dd format.", e);
+      }
     }
 
     private static void saveNow(AppState state) {
