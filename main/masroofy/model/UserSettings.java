@@ -6,8 +6,8 @@ import java.util.Map;
 /**
  * User settings persisted in {@link AppState}.
  *
- * <p>Privacy lock stores a salted hash:
- * {@code pinHash = SHA-256(saltBase64 + ":" + pin)}.
+ * <p>Privacy lock stores a simple hash:
+ * {@code pinHashHex = SHA-256(pin)}.
  */
 public class UserSettings {
   private boolean privacyLockEnabled;

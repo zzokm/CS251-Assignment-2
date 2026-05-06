@@ -15,6 +15,7 @@ public class Cycle {
   private String startDate;
   private String endDate;
   private String lastCalculatedDate;
+  private boolean alert80Shown;
 
   public Cycle() {}
 
@@ -29,6 +30,7 @@ public class Cycle {
     this.startDate = startDate;
     this.endDate = endDate;
     this.lastCalculatedDate = startDate;
+    this.alert80Shown = false;
   }
 
   /** Returns the saved cycle id. */
@@ -81,6 +83,20 @@ public class Cycle {
     this.lastCalculatedDate = lastCalculatedDate;
   }
 
+  /**
+   * Returns whether the 80% warning was already shown for this cycle (US #6).
+   *
+   * <p>This is saved in JSON to avoid spamming the user with repeated warnings.
+   */
+  public boolean isAlert80Shown() {
+    return alert80Shown;
+  }
+
+  /** Sets whether the 80% warning was already shown for this cycle (US #6). */
+  public void setAlert80Shown(boolean alert80Shown) {
+    this.alert80Shown = alert80Shown;
+  }
+
   /** Converts this cycle to a JSON-friendly object. */
   public Map<String, Object> toJsonObject() {
     Map<String, Object> o = new LinkedHashMap<>();
@@ -89,6 +105,7 @@ public class Cycle {
     o.put("startDate", startDate);
     o.put("endDate", endDate);
     o.put("lastCalculatedDate", lastCalculatedDate);
+    o.put("alert80Shown", alert80Shown);
     return o;
   }
 
@@ -106,6 +123,8 @@ public class Cycle {
     if (end instanceof String) c.setEndDate((String) end);
     Object last = o.get("lastCalculatedDate");
     if (last instanceof String) c.setLastCalculatedDate((String) last);
+    Object shown = o.get("alert80Shown");
+    if (shown instanceof Boolean) c.setAlert80Shown((Boolean) shown);
     return c;
   }
 }

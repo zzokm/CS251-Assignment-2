@@ -77,5 +77,21 @@ public class ReportManager {
     }
     return out;
   }
+
+  /**
+   * Builds a simple ASCII bar using only keyboard characters.
+   *
+   * <p>Example: {@code [######--------------]}
+   *
+   * @param percent value between 0 and 100
+   * @param width bar width (commonly 20)
+   * @return bar string
+   */
+  public String bar(double percent, int width) {
+    int w = Math.max(1, width);
+    double p = Math.max(0.0, Math.min(100.0, percent));
+    int filled = (int) Math.round((p / 100.0) * w);
+    return "[" + "#".repeat(filled) + "-".repeat(w - filled) + "]";
+  }
 }
 

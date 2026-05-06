@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Java: Run Masroofy",
+      "type": "shell",
+      "command": "javac (Get-ChildItem -Recurse -Filter *.java -Path main | ForEach-Object FullName); java -cp main masroofy.Main",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
+

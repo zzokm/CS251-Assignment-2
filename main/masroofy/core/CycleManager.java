@@ -12,6 +12,27 @@ import java.time.temporal.ChronoUnit;
 /** Handles budget cycle setup and cycle-based calculations. */
 public class CycleManager {
 
+  /** Result returned from threshold checks (US #6). */
+  public static final class ThresholdResult {
+    private final boolean budgetExhausted;
+    private final boolean show80Warning;
+
+    public ThresholdResult(boolean budgetExhausted, boolean show80Warning) {
+      this.budgetExhausted = budgetExhausted;
+      this.show80Warning = show80Warning;
+    }
+
+    /** Returns true when total spent is greater than or equal to allowance. */
+    public boolean isBudgetExhausted() {
+      return budgetExhausted;
+    }
+
+    /** Returns true when 80% warning should be shown now (one-time). */
+    public boolean shouldShow80Warning() {
+      return show80Warning;
+    }
+  }
+
   /** Result returned after checking whether daily rollover changed the cycle calculation date. */
   public static final class RolloverResult {
     private final boolean rolloverApplied;
@@ -237,6 +258,42 @@ public class CycleManager {
     return state != null && state.getActiveCycle() != null;
   }
 
+  /**
+   * Checks spending thresholds for the active cycle (US #6).
+   *
+   * <p>Rules:
+   * <ul>
+   *   <li>If spent >= allowance → budget exhausted.</li>
+   *   <li>If spent/allowance >= 0.80 and the warning has not been shown before → show warning once
+   *       and persist the flag.</li>
+   * </ul>
+   *
+   * <p>This method may save JSON if it needs to mark the 80% warning as shown.
+   *
+   * @param state application state containing active cycle and expenses
+   * @return threshold result for the UI
+   */
+  public ThresholdResult checkThresholds(AppState state) {
+    validateState(state);
+    validateCycleExists(state.getActiveCycle());
+
+    Cycle cycle = state.getActiveCycle();
+    double allowance = cycle.getTotalAllowance();
+    if (allowance <= 0.0) return new ThresholdResult(false, false);
+
+    double spent = allowance - calculateRemainingBalance(state);
+    boolean exhausted = spent >= allowance;
+
+    boolean show80 = false;
+    if (!cycle.isAlert80Shown() && spent / allowance >= 0.80) {
+      show80 = true;
+      cycle.setAlert80Shown(true);
+      saveNow(state);
+    }
+
+    return new ThresholdResult(exhausted, show80);
+  }
+
   private static void validateCycleInput(
       double totalAllowance, LocalDate startDate, LocalDate endDate) {
     if (totalAllowance <= 0.0) {
@@ -325,6 +382,20 @@ public class CycleManager {
 
     state.setActiveCycle(newCycle);
 
+    saveNow(state);
+  }
+
+  /**
+   * Resets the current budget cycle (US #11).
+   *
+   * <p>Clears the active cycle and removes all expenses. Categories and privacy settings are kept.
+   * Changes are saved immediately.
+   */
+  public void resetCycle(AppState state) {
+    validateState(state);
+    state.setActiveCycle(null);
+    state.getExpenses().clear();
+    state.setNextExpenseId(1L);
     saveNow(state);
   }
 

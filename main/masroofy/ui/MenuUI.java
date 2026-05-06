@@ -1,44 +1,81 @@
 package masroofy.ui;
 
+import masroofy.core.AuthManager;
 import masroofy.core.CycleManager;
 import masroofy.core.ExpenseManager;
 import masroofy.model.AppState;
 import masroofy.model.Category;
 import masroofy.model.Expense;
-import java.time.LocalDate;
 import java.util.Scanner;
 
 /** Main console menu and startup router. */
 public class MenuUI {
+  private final AuthManager authManager;
   private final CycleManager cycleManager;
   private final ExpenseManager expenseManager;
   private final SetupUI setupUI;
+  private final DashboardUI dashboardUI;
   private final HistoryUI historyUI;
+  private final SettingsUI settingsUI;
 
   /** Creates the menu with default dependencies. */
   public MenuUI() {
-    this(new CycleManager(), new ExpenseManager(), new SetupUI(), new HistoryUI());
+    this(
+        new AuthManager(),
+        new CycleManager(),
+        new ExpenseManager(),
+        new SetupUI(),
+        new DashboardUI(),
+        new HistoryUI(),
+        new SettingsUI());
   }
 
   /** Creates the menu with injected dependencies. */
   public MenuUI(CycleManager cycleManager, SetupUI setupUI, HistoryUI historyUI) {
-    this(cycleManager, new ExpenseManager(), setupUI, historyUI);
+    this(
+        new AuthManager(),
+        cycleManager,
+        new ExpenseManager(),
+        setupUI,
+        new DashboardUI(),
+        historyUI,
+        new SettingsUI());
   }
 
   /** Creates the menu with injected dependencies. */
   public MenuUI(
+      AuthManager authManager,
       CycleManager cycleManager,
       ExpenseManager expenseManager,
       SetupUI setupUI,
+      DashboardUI dashboardUI,
       HistoryUI historyUI) {
+    this(authManager, cycleManager, expenseManager, setupUI, dashboardUI, historyUI, new SettingsUI());
+  }
+
+  /** Creates the menu with injected dependencies. */
+  public MenuUI(
+      AuthManager authManager,
+      CycleManager cycleManager,
+      ExpenseManager expenseManager,
+      SetupUI setupUI,
+      DashboardUI dashboardUI,
+      HistoryUI historyUI,
+      SettingsUI settingsUI) {
+    if (authManager == null) throw new IllegalArgumentException("authManager cannot be null");
     if (cycleManager == null) throw new IllegalArgumentException("cycleManager cannot be null");
     if (expenseManager == null) throw new IllegalArgumentException("expenseManager cannot be null");
     if (setupUI == null) throw new IllegalArgumentException("setupUI cannot be null");
+    if (dashboardUI == null) throw new IllegalArgumentException("dashboardUI cannot be null");
     if (historyUI == null) throw new IllegalArgumentException("historyUI cannot be null");
+    if (settingsUI == null) throw new IllegalArgumentException("settingsUI cannot be null");
+    this.authManager = authManager;
     this.cycleManager = cycleManager;
     this.expenseManager = expenseManager;
     this.setupUI = setupUI;
+    this.dashboardUI = dashboardUI;
     this.historyUI = historyUI;
+    this.settingsUI = settingsUI;
   }
 
   /**
@@ -54,11 +91,15 @@ public class MenuUI {
     if (state == null) throw new IllegalArgumentException("state cannot be null");
 
     Scanner scanner = new Scanner(System.in);
+
+    if (!runPrivacyGate(state, scanner)) {
+      return;
+    }
+
     if (!cycleManager.hasActiveCycle(state)) {
       setupUI.startSetup(state, scanner);
     }
 
-    showRolloverStatus(state);
     showMainMenu(state, scanner);
   }
 
@@ -67,19 +108,42 @@ public class MenuUI {
     while (running) {
       System.out.println();
       System.out.println("Menu");
-      System.out.println("1. Add expense");
-      System.out.println("2. Filter transaction history");
+      System.out.println("1. Dashboard");
+      System.out.println("2. Add expense");
+      System.out.println("3. History");
+      System.out.println("4. Filter history");
+      System.out.println("5. Edit transaction");
+      System.out.println("6. Delete transaction");
+      System.out.println("7. Settings");
       System.out.println("0. Exit");
       System.out.print("Choose: ");
 
       String choice = scanner.nextLine().trim();
       switch (choice) {
         case "1":
-          showAddExpense(state, scanner);
-          showRolloverStatus(state);
+          dashboardUI.show(state);
           break;
         case "2":
+          showAddExpense(state, scanner);
+          dashboardUI.show(state);
+          break;
+        case "3":
+          historyUI.showHistory(state);
+          break;
+        case "4":
           historyUI.showFilteredHistory(state, scanner);
+          break;
+        case "5":
+          historyUI.editTransaction(state, scanner);
+          break;
+        case "6":
+          historyUI.deleteTransaction(state, scanner);
+          break;
+        case "7":
+          settingsUI.show(state, scanner);
+          if (!cycleManager.hasActiveCycle(state)) {
+            setupUI.startSetup(state, scanner);
+          }
           break;
         case "0":
           running = false;
@@ -122,23 +186,22 @@ public class MenuUI {
     }
   }
 
-  private void showRolloverStatus(AppState state) {
-    CycleManager.RolloverResult result =
-        cycleManager.handleRolloverIfNeeded(state, LocalDate.now());
+  private boolean runPrivacyGate(AppState state, Scanner scanner) {
+    if (!authManager.isLockEnabled(state)) return true;
 
-    System.out.println();
-    if (result.isRolloverApplied()) {
-      System.out.println("Daily rollover applied for today.");
-    } else {
-      System.out.println("Daily rollover already up to date.");
+    while (true) {
+      long now = System.currentTimeMillis();
+      if (authManager.isLockedOut(state, now)) {
+        long sec = (authManager.lockoutRemainingMillis(state, now) + 999) / 1000;
+        System.out.println("Locked out. Try again in " + sec + " seconds.");
+        return false;
+      }
+
+      System.out.print("Enter PIN: ");
+      String pin = scanner.nextLine();
+      boolean ok = authManager.verifyPin(state, pin);
+      if (ok) return true;
+      System.out.println("Wrong PIN.");
     }
-
-    if (result.isOverspent()) {
-      System.out.println("Warning: spending is above the cycle allowance.");
-    }
-
-    System.out.printf("Remaining balance: %.2f EGP%n", result.getRemainingBalance());
-    System.out.printf("Remaining days: %d%n", result.getRemainingDays());
-    System.out.printf("Safe daily limit: %.2f EGP%n", result.getSafeDailyLimit());
   }
 }
