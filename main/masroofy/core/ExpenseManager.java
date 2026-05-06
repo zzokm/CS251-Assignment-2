@@ -21,8 +21,6 @@ public class ExpenseManager {
     /** Creates a new expense manager. */
     public ExpenseManager() {}
 
-    private final Notifications notifications = new Notifications();
-
     /**
      * Adds a new expense transaction and saves it immediately.
      *
@@ -46,7 +44,7 @@ public class ExpenseManager {
               normalizeNote(note));
       state.getExpenses().add(expense);
       saveNow(state);
-      notifications.expenseAdded(categoryName(state, categoryId), amount);
+      Notifications.forState(state).expenseAdded(categoryName(state, categoryId), amount);
       return expense;
     }
 

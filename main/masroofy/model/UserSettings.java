@@ -15,6 +15,7 @@ public class UserSettings {
   private String pinHashHex;
   private int failedAttempts;
   private long lockoutUntilMillis;
+  private String ntfyTopicSuffix;
 
   /** Creates default settings (privacy lock off). */
   public UserSettings() {}
@@ -76,6 +77,24 @@ public class UserSettings {
   }
 
   /**
+   * Returns the saved 2-digit notification topic suffix (e.g., {@code 07}).
+   *
+   * @return suffix (nullable if not set yet)
+   */
+  public String getNtfyTopicSuffix() {
+    return ntfyTopicSuffix;
+  }
+
+  /**
+   * Sets the saved 2-digit notification topic suffix.
+   *
+   * @param ntfyTopicSuffix suffix (e.g., {@code 07})
+   */
+  public void setNtfyTopicSuffix(String ntfyTopicSuffix) {
+    this.ntfyTopicSuffix = ntfyTopicSuffix;
+  }
+
+  /**
    * Converts settings to a JSON-friendly object.
    *
    * @return map containing settings fields
@@ -87,6 +106,7 @@ public class UserSettings {
     o.put("pinHashHex", pinHashHex);
     o.put("failedAttempts", failedAttempts);
     o.put("lockoutUntilMillis", lockoutUntilMillis);
+    o.put("ntfyTopicSuffix", ntfyTopicSuffix);
     return o;
   }
 
@@ -109,6 +129,8 @@ public class UserSettings {
     if (fa instanceof Number) s.setFailedAttempts(((Number) fa).intValue());
     Object lo = o.get("lockoutUntilMillis");
     if (lo instanceof Number) s.setLockoutUntilMillis(((Number) lo).longValue());
+    Object suf = o.get("ntfyTopicSuffix");
+    if (suf instanceof String) s.setNtfyTopicSuffix((String) suf);
     return s;
   }
 }
