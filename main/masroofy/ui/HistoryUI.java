@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
-/** Console history screen for US #9: Filter Transaction History. */
+/** Console history screen (US #7, #8, #9). */
 public class HistoryUI {
   private static final DateTimeFormatter DATE_TIME_FORMAT =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -57,6 +57,102 @@ public class HistoryUI {
 
       List<Expense> results = expenseManager.filterHistory(state, categoryId, fromDate, toDate);
       printExpenses(state, results);
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  /**
+   * Shows the full history list (newest first) (US #7).
+   *
+   * @param state current application state
+   */
+  public void showHistory(AppState state) {
+    if (state == null) throw new IllegalArgumentException("state cannot be null");
+    List<Expense> expenses = expenseManager.getExpensesSortedByDate(state);
+    printExpenses(state, expenses);
+  }
+
+  /**
+   * Prompts the user to edit an existing transaction (US #8).
+   *
+   * @param state current application state
+   * @param scanner console input scanner
+   */
+  public void editTransaction(AppState state, Scanner scanner) {
+    if (state == null) throw new IllegalArgumentException("state cannot be null");
+    if (scanner == null) throw new IllegalArgumentException("scanner cannot be null");
+
+    System.out.print("Transaction id to edit: ");
+    String raw = scanner.nextLine().trim();
+    long id;
+    try {
+      id = Long.parseLong(raw);
+    } catch (NumberFormatException e) {
+      System.out.println("Id must be a number.");
+      return;
+    }
+
+    System.out.print("New amount (EGP): ");
+    double amount;
+    try {
+      amount = Double.parseDouble(scanner.nextLine().trim());
+    } catch (NumberFormatException e) {
+      System.out.println("Amount must be a valid number.");
+      return;
+    }
+
+    printCategories(state);
+    System.out.print("New category id: ");
+    int categoryId;
+    try {
+      categoryId = Integer.parseInt(scanner.nextLine().trim());
+    } catch (NumberFormatException e) {
+      System.out.println("Category id must be a number.");
+      return;
+    }
+
+    System.out.print("New note (optional): ");
+    String note = scanner.nextLine();
+
+    try {
+      expenseManager.editExpense(state, id, amount, categoryId, note);
+      System.out.println("Transaction updated.");
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  /**
+   * Prompts the user to delete a transaction with confirmation (US #8).
+   *
+   * @param state current application state
+   * @param scanner console input scanner
+   */
+  public void deleteTransaction(AppState state, Scanner scanner) {
+    if (state == null) throw new IllegalArgumentException("state cannot be null");
+    if (scanner == null) throw new IllegalArgumentException("scanner cannot be null");
+
+    System.out.print("Transaction id to delete: ");
+    String raw = scanner.nextLine().trim();
+    long id;
+    try {
+      id = Long.parseLong(raw);
+    } catch (NumberFormatException e) {
+      System.out.println("Id must be a number.");
+      return;
+    }
+
+    System.out.print("Confirm delete? (y/n): ");
+    String confirm = scanner.nextLine().trim().toLowerCase();
+    if (!confirm.equals("y")) {
+      System.out.println("Cancelled.");
+      return;
+    }
+
+    try {
+      expenseManager.deleteExpense(state, id);
+      System.out.println("Transaction deleted.");
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     }

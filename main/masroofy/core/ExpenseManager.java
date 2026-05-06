@@ -1,23 +1,22 @@
-  package masroofy.core;
+package masroofy.core;
 
-  import masroofy.model.AppState;
-  import masroofy.model.Category;
-  import masroofy.model.Expense;
-  import masroofy.storage.JsonStore;
-  import java.io.IOException;
-  import java.time.LocalDate;
-  import java.time.format.DateTimeParseException;
-  import java.util.Iterator;
-  import java.util.ArrayList;
-  import java.util.List;
+import masroofy.model.AppState;
+import masroofy.model.Category;
+import masroofy.model.Expense;
+import masroofy.storage.JsonStore;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-
-  /**
-   * Expense operations used by History flows (US #8).
-   *
-   * <p>Persistence rule: any edit/delete is saved immediately to JSON.
-   */
-  public class ExpenseManager {
+/**
+ * Expense operations used by history flows (US #2, #7, #8, #9).
+ *
+ * <p>Persistence rule: any add/edit/delete is saved immediately to JSON.
+ */
+public class ExpenseManager {
 
     /**
      * Adds a new expense transaction and saves it immediately.
@@ -185,5 +184,4 @@
         throw new IllegalStateException("Failed to save state", e);
       }
     }
-  }
-
+}
