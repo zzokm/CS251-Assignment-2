@@ -2,6 +2,7 @@ package masroofy.ui;
 
 import masroofy.core.AuthManager;
 import masroofy.core.CycleManager;
+import masroofy.core.Notifications;
 import masroofy.model.AppState;
 import java.util.Scanner;
 
@@ -47,6 +48,7 @@ public class SettingsUI {
       System.out.println("1. Enable / set PIN");
       System.out.println("2. Disable lock");
       System.out.println("3. Reset cycle");
+      System.out.println("4. Show notification link");
       System.out.println("0. Back");
       System.out.print("Choose: ");
 
@@ -60,6 +62,9 @@ public class SettingsUI {
           break;
         case "3":
           resetCycle(state, scanner);
+          break;
+        case "4":
+          showNotificationLink(state);
           break;
         case "0":
           running = false;
@@ -97,6 +102,13 @@ public class SettingsUI {
     }
     cycleManager.resetCycle(state);
     System.out.println("Cycle reset.");
+  }
+
+  private void showNotificationLink(AppState state) {
+    String url = Notifications.publicLink(state);
+    System.out.println("Your ntfy topic link:");
+    System.out.println(url);
+    System.out.println("(Subscribe to this link to receive notifications.)");
   }
 }
 

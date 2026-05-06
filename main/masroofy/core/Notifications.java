@@ -1,28 +1,34 @@
 package masroofy.core;
 
+import masroofy.model.AppState;
+import masroofy.model.UserSettings;
+import masroofy.storage.JsonStore;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Duration;
 
 /**
  * Sends push notifications using ntfy (HTTP POST).
  *
- * <p>Defaults target: {@code https://ntfy.sh/masroofyapp}.
+ * <p>Defaults target: {@code https://ntfy.sh/masroofyXX} where {@code XX} is a 2-digit id stored in
+ * settings (or derived from the machine when missing).
  *
  * <p>Configuration via environment variables:
  * <ul>
  *   <li>{@code NTFY_ENABLED} (default true)</li>
  *   <li>{@code NTFY_BASE_URL} (default https://ntfy.sh)</li>
- *   <li>{@code NTFY_TOPIC} (default masroofyapp)</li>
+ *   <li>{@code NTFY_TOPIC} (optional override)</li>
  * </ul>
  *
  * <p>Failures should never crash the app; sending is best-effort.
  */
 public final class Notifications {
   private static final Duration TIMEOUT = Duration.ofSeconds(5);
+  private static final String BASE_TOPIC = "masroofy";
 
   private final HttpClient http;
   private final boolean enabled;
@@ -32,6 +38,40 @@ public final class Notifications {
   /** Creates a notifier using environment-variable configuration. */
   public Notifications() {
     this(HttpClient.newBuilder().connectTimeout(TIMEOUT).build(), readEnabled(), readBaseUrl(), readTopic());
+  }
+
+  /**
+   * Creates a notifier using the per-machine topic saved in the application state.
+   *
+   * @param state application state
+   * @return notifier targeting {@code https://ntfy.sh/masroofyXX} (by default)
+   */
+  public static Notifications forState(AppState state) {
+    String baseUrl = readBaseUrl();
+    String envTopic = readTopicOverride();
+    if (envTopic != null) {
+      return new Notifications(HttpClient.newBuilder().connectTimeout(TIMEOUT).build(), readEnabled(), baseUrl, envTopic);
+    }
+    String suffix = ensureTopicSuffix(state);
+    return new Notifications(
+        HttpClient.newBuilder().connectTimeout(TIMEOUT).build(),
+        readEnabled(),
+        baseUrl,
+        BASE_TOPIC + suffix);
+  }
+
+  /**
+   * Returns the public ntfy link for this machine/topic, generating and saving the 2-digit suffix if
+   * missing.
+   *
+   * @param state application state
+   * @return public ntfy URL (e.g. {@code https://ntfy.sh/masroofy07})
+   */
+  public static String publicLink(AppState state) {
+    String baseUrl = readBaseUrl();
+    String envTopic = readTopicOverride();
+    String topic = (envTopic != null) ? envTopic : (BASE_TOPIC + ensureTopicSuffix(state));
+    return stripTrailingSlash(baseUrl) + "/" + topic;
   }
 
   /**
@@ -153,8 +193,69 @@ public final class Notifications {
   }
 
   private static String readTopic() {
+    // Kept for backwards compatibility: if no override exists, use a stable machine-derived default.
+    String override = readTopicOverride();
+    return (override != null) ? override : (BASE_TOPIC + computeMachineSuffix());
+  }
+
+  private static String readTopicOverride() {
     String v = System.getenv("NTFY_TOPIC");
-    return (v == null || v.isBlank()) ? "masroofyapp" : v.trim();
+    if (v == null || v.isBlank()) return null;
+    return v.trim();
+  }
+
+  private static String ensureTopicSuffix(AppState state) {
+    if (state == null) {
+      return computeMachineSuffix();
+    }
+    if (state.getSettings() == null) {
+      state.setSettings(new UserSettings());
+    }
+    UserSettings s = state.getSettings();
+    String current = (s.getNtfyTopicSuffix() == null) ? "" : s.getNtfyTopicSuffix().trim();
+    if (isTwoDigits(current)) return current;
+
+    String suffix = computeMachineSuffix();
+    s.setNtfyTopicSuffix(suffix);
+    try {
+      JsonStore.saveState(state);
+    } catch (Exception e) {
+      // Best-effort: if saving fails, still return a stable suffix.
+      System.err.println("Failed to persist ntfy topic suffix: " + e.getMessage());
+    }
+    return suffix;
+  }
+
+  private static boolean isTwoDigits(String s) {
+    if (s == null || s.length() != 2) return false;
+    return Character.isDigit(s.charAt(0)) && Character.isDigit(s.charAt(1));
+  }
+
+  private static String computeMachineSuffix() {
+    // Stable per machine/user profile (simple, not security-sensitive).
+    String seed =
+        System.getProperty("os.name", "")
+            + "|"
+            + System.getProperty("os.arch", "")
+            + "|"
+            + System.getProperty("user.name", "")
+            + "|"
+            + System.getProperty("user.home", "");
+    int n = Math.floorMod(sha256Int(seed), 100);
+    return String.format("%02d", n);
+  }
+
+  private static int sha256Int(String s) {
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      byte[] out = md.digest((s == null ? "" : s).getBytes(StandardCharsets.UTF_8));
+      // Use first 4 bytes as int.
+      int v = 0;
+      for (int i = 0; i < 4 && i < out.length; i++) v = (v << 8) | (out[i] & 0xff);
+      return v;
+    } catch (Exception e) {
+      return (s == null) ? 0 : s.hashCode();
+    }
   }
 
   private static String stripTrailingSlash(String s) {
