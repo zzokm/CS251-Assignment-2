@@ -12,10 +12,17 @@ public class DashboardUI {
   private final CycleManager cycleManager;
   private final ReportManager reportManager;
 
+  /** Creates a dashboard UI with default managers. */
   public DashboardUI() {
     this(new CycleManager(), new ReportManager());
   }
 
+  /**
+   * Creates a dashboard UI with injected managers.
+   *
+   * @param cycleManager cycle logic
+   * @param reportManager reporting logic
+   */
   public DashboardUI(CycleManager cycleManager, ReportManager reportManager) {
     if (cycleManager == null) throw new IllegalArgumentException("cycleManager cannot be null");
     if (reportManager == null) throw new IllegalArgumentException("reportManager cannot be null");
@@ -27,6 +34,8 @@ public class DashboardUI {
    * Shows dashboard numbers and spending insights.
    *
    * <p>Also triggers rollover check (US #5) and threshold messages (US #6).
+   *
+   * @param state application state
    */
   public void show(AppState state) {
     if (state == null) throw new IllegalArgumentException("state cannot be null");

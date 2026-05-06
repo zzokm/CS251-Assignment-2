@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Loads/saves application JSON to {@link Paths#APP_STATE_JSON}.
  *
- * <h3>Design goals</h3>
+ * <p><b>Design goals</b>
  * <ul>
  *   <li>Zero external dependencies (no Gson/Jackson).</li>
  *   <li>Human-readable JSON for easy TA review/debugging.</li>
@@ -30,6 +30,8 @@ public final class JsonStore {
    * Loads application state from disk.
    *
    * <p>If the state file is missing or invalid, returns a new state with seeded categories.
+   *
+   * @return loaded application state
    */
   public static AppState loadState() {
     return AppState.fromJsonObject(loadObject());

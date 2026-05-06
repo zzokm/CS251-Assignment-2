@@ -15,7 +15,11 @@ public class SetupUI {
     this(new CycleManager());
   }
 
-  /** Creates the setup screen with an injected cycle manager. */
+  /**
+   * Creates the setup screen with an injected cycle manager.
+   *
+   * @param cycleManager cycle manager
+   */
   public SetupUI(CycleManager cycleManager) {
     if (cycleManager == null) throw new IllegalArgumentException("cycleManager cannot be null");
     this.cycleManager = cycleManager;

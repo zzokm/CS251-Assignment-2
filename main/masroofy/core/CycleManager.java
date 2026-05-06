@@ -11,23 +11,39 @@ import java.time.temporal.ChronoUnit;
 
 /** Handles budget cycle setup and cycle-based calculations. */
 public class CycleManager {
+  /** Creates a new cycle manager. */
+  public CycleManager() {}
 
   /** Result returned from threshold checks (US #6). */
   public static final class ThresholdResult {
     private final boolean budgetExhausted;
     private final boolean show80Warning;
 
+    /**
+     * Creates a threshold result.
+     *
+     * @param budgetExhausted true if total spent >= allowance
+     * @param show80Warning true if 80% warning should be shown now
+     */
     public ThresholdResult(boolean budgetExhausted, boolean show80Warning) {
       this.budgetExhausted = budgetExhausted;
       this.show80Warning = show80Warning;
     }
 
-    /** Returns true when total spent is greater than or equal to allowance. */
+    /**
+     * Returns true when total spent is greater than or equal to allowance.
+     *
+     * @return true if the budget is exhausted
+     */
     public boolean isBudgetExhausted() {
       return budgetExhausted;
     }
 
-    /** Returns true when 80% warning should be shown now (one-time). */
+    /**
+     * Returns true when 80% warning should be shown now (one-time).
+     *
+     * @return true if the warning should be printed now
+     */
     public boolean shouldShow80Warning() {
       return show80Warning;
     }
@@ -40,6 +56,14 @@ public class CycleManager {
     private final long remainingDays;
     private final double safeDailyLimit;
 
+    /**
+     * Creates a rollover result.
+     *
+     * @param rolloverApplied true if lastCalculatedDate was advanced and saved
+     * @param remainingBalance allowance minus spent
+     * @param remainingDays remaining days used in limit calculation (>= 1)
+     * @param safeDailyLimit remainingBalance / remainingDays
+     */
     public RolloverResult(
         boolean rolloverApplied,
         double remainingBalance,
@@ -51,27 +75,47 @@ public class CycleManager {
       this.safeDailyLimit = safeDailyLimit;
     }
 
-    /** Returns true when the saved calculation date was advanced to today. */
+    /**
+     * Returns true when the saved calculation date was advanced to today.
+     *
+     * @return true if rollover was applied
+     */
     public boolean isRolloverApplied() {
       return rolloverApplied;
     }
 
-    /** Returns the allowance remaining after saved expenses. */
+    /**
+     * Returns the allowance remaining after saved expenses.
+     *
+     * @return remaining balance
+     */
     public double getRemainingBalance() {
       return remainingBalance;
     }
 
-    /** Returns the number of days used in the safe daily limit calculation. */
+    /**
+     * Returns the number of days used in the safe daily limit calculation.
+     *
+     * @return remaining days
+     */
     public long getRemainingDays() {
       return remainingDays;
     }
 
-    /** Returns the recalculated safe daily limit. */
+    /**
+     * Returns the recalculated safe daily limit.
+     *
+     * @return safe daily limit
+     */
     public double getSafeDailyLimit() {
       return safeDailyLimit;
     }
 
-    /** Returns true when spending is already higher than the cycle allowance. */
+    /**
+     * Returns true when spending is already higher than the cycle allowance.
+     *
+     * @return true if remainingBalance is negative
+     */
     public boolean isOverspent() {
       return remainingBalance < 0.0;
     }
@@ -390,6 +434,8 @@ public class CycleManager {
    *
    * <p>Clears the active cycle and removes all expenses. Categories and privacy settings are kept.
    * Changes are saved immediately.
+   *
+   * @param state application state to update
    */
   public void resetCycle(AppState state) {
     validateState(state);

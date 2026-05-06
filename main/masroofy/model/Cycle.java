@@ -17,13 +17,28 @@ public class Cycle {
   private String lastCalculatedDate;
   private boolean alert80Shown;
 
+  /** Creates an empty cycle (used by JSON loading). */
   public Cycle() {}
 
+  /**
+   * Creates a cycle with id and allowance (dates can be set later).
+   *
+   * @param id cycle id
+   * @param totalAllowance allowance amount
+   */
   public Cycle(long id, double totalAllowance) {
     this.id = id;
     this.totalAllowance = totalAllowance;
   }
 
+  /**
+   * Creates a full cycle with allowance and dates.
+   *
+   * @param id cycle id
+   * @param totalAllowance allowance amount
+   * @param startDate cycle start date (yyyy-MM-dd)
+   * @param endDate cycle end date (yyyy-MM-dd)
+   */
   public Cycle(long id, double totalAllowance, String startDate, String endDate) {
     this.id = id;
     this.totalAllowance = totalAllowance;
@@ -33,52 +48,52 @@ public class Cycle {
     this.alert80Shown = false;
   }
 
-  /** Returns the saved cycle id. */
+  /** @return the saved cycle id */
   public long getId() {
     return id;
   }
 
-  /** Sets the saved cycle id. */
+  /** @param id the saved cycle id */
   public void setId(long id) {
     this.id = id;
   }
 
-  /** Returns the starting allowance amount for this cycle. */
+  /** @return the starting allowance amount for this cycle */
   public double getTotalAllowance() {
     return totalAllowance;
   }
 
-  /** Sets the starting allowance amount for this cycle. */
+  /** @param totalAllowance the starting allowance amount for this cycle */
   public void setTotalAllowance(double totalAllowance) {
     this.totalAllowance = totalAllowance;
   }
 
-  /** Returns the cycle start date in {@code yyyy-MM-dd} format. */
+  /** @return the cycle start date in {@code yyyy-MM-dd} format */
   public String getStartDate() {
     return startDate;
   }
 
-  /** Sets the cycle start date in {@code yyyy-MM-dd} format. */
+  /** @param startDate the cycle start date in {@code yyyy-MM-dd} format */
   public void setStartDate(String startDate) {
     this.startDate = startDate;
   }
 
-  /** Returns the cycle end date in {@code yyyy-MM-dd} format. */
+  /** @return the cycle end date in {@code yyyy-MM-dd} format */
   public String getEndDate() {
     return endDate;
   }
 
-  /** Sets the cycle end date in {@code yyyy-MM-dd} format. */
+  /** @param endDate the cycle end date in {@code yyyy-MM-dd} format */
   public void setEndDate(String endDate) {
     this.endDate = endDate;
   }
 
-  /** Returns the last date rollover calculations were checked. */
+  /** @return last date rollover calculations were checked */
   public String getLastCalculatedDate() {
     return lastCalculatedDate;
   }
 
-  /** Sets the last date rollover calculations were checked. */
+  /** @param lastCalculatedDate last date rollover calculations were checked */
   public void setLastCalculatedDate(String lastCalculatedDate) {
     this.lastCalculatedDate = lastCalculatedDate;
   }
@@ -87,17 +102,23 @@ public class Cycle {
    * Returns whether the 80% warning was already shown for this cycle (US #6).
    *
    * <p>This is saved in JSON to avoid spamming the user with repeated warnings.
+   *
+   * @return true if warning already shown
    */
   public boolean isAlert80Shown() {
     return alert80Shown;
   }
 
-  /** Sets whether the 80% warning was already shown for this cycle (US #6). */
+  /** @param alert80Shown whether the 80% warning was already shown for this cycle (US #6) */
   public void setAlert80Shown(boolean alert80Shown) {
     this.alert80Shown = alert80Shown;
   }
 
-  /** Converts this cycle to a JSON-friendly object. */
+  /**
+   * Converts this cycle to a JSON-friendly object.
+   *
+   * @return map containing cycle fields
+   */
   public Map<String, Object> toJsonObject() {
     Map<String, Object> o = new LinkedHashMap<>();
     o.put("id", id);
@@ -109,7 +130,12 @@ public class Cycle {
     return o;
   }
 
-  /** Creates a cycle from a JSON-friendly object. */
+  /**
+   * Creates a cycle from a JSON-friendly object.
+   *
+   * @param o parsed JSON object map
+   * @return cycle
+   */
   public static Cycle fromJsonObject(Map<String, Object> o) {
     Cycle c = new Cycle();
     if (o == null) return c;

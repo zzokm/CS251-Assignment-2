@@ -18,6 +18,7 @@ public class AppState {
   private UserSettings settings;
   private long nextExpenseId;
 
+  /** Creates a new empty state (first run). */
   public AppState() {
     this.expenses = new ArrayList<>();
     this.categories = new ArrayList<>();
@@ -25,46 +26,101 @@ public class AppState {
     this.nextExpenseId = 1L;
   }
 
+  /**
+   * Returns the currently active cycle, or null if none exists.
+   *
+   * @return active cycle or null
+   */
   public Cycle getActiveCycle() {
     return activeCycle;
   }
 
+  /**
+   * Sets the active cycle.
+   *
+   * @param activeCycle new active cycle (nullable)
+   */
   public void setActiveCycle(Cycle activeCycle) {
     this.activeCycle = activeCycle;
   }
 
+  /**
+   * Returns the in-memory list of expenses.
+   *
+   * @return expense list (never null)
+   */
   public List<Expense> getExpenses() {
     return expenses;
   }
 
+  /**
+   * Replaces the expense list.
+   *
+   * @param expenses new expenses list (null becomes empty)
+   */
   public void setExpenses(List<Expense> expenses) {
     this.expenses = (expenses == null) ? new ArrayList<>() : expenses;
   }
 
+  /**
+   * Returns the category list.
+   *
+   * @return categories (never null)
+   */
   public List<Category> getCategories() {
     return categories;
   }
 
+  /**
+   * Replaces the category list.
+   *
+   * @param categories new categories list (null becomes empty)
+   */
   public void setCategories(List<Category> categories) {
     this.categories = (categories == null) ? new ArrayList<>() : categories;
   }
 
+  /**
+   * Returns user settings.
+   *
+   * @return settings (never null)
+   */
   public UserSettings getSettings() {
     return settings;
   }
 
+  /**
+   * Replaces user settings.
+   *
+   * @param settings new settings (null becomes default settings)
+   */
   public void setSettings(UserSettings settings) {
     this.settings = (settings == null) ? new UserSettings() : settings;
   }
 
+  /**
+   * Returns the next expense id that will be allocated.
+   *
+   * @return next id (>= 1)
+   */
   public long getNextExpenseId() {
     return nextExpenseId;
   }
 
+  /**
+   * Sets the next expense id.
+   *
+   * @param nextExpenseId next id (values &lt; 1 become 1)
+   */
   public void setNextExpenseId(long nextExpenseId) {
     this.nextExpenseId = Math.max(1L, nextExpenseId);
   }
 
+  /**
+   * Allocates a new unique expense id and increments the counter.
+   *
+   * @return allocated id
+   */
   public long allocateExpenseId() {
     long id = nextExpenseId;
     nextExpenseId = id + 1;
@@ -83,6 +139,11 @@ public class AppState {
     categories.add(new Category(6, "Other"));
   }
 
+  /**
+   * Converts this state to a JSON-friendly object graph (Maps/Lists/primitive values).
+   *
+   * @return JSON root object map
+   */
   public Map<String, Object> toJsonObject() {
     Map<String, Object> root = new LinkedHashMap<>();
     root.put("nextExpenseId", nextExpenseId);
@@ -100,6 +161,12 @@ public class AppState {
     return root;
   }
 
+  /**
+   * Parses state from a JSON root object map.
+   *
+   * @param root parsed JSON root (object)
+   * @return application state
+   */
   public static AppState fromJsonObject(Map<String, Object> root) {
     AppState s = new AppState();
     if (root == null) return s;

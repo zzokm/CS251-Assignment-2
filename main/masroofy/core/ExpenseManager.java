@@ -18,6 +18,9 @@ import java.util.List;
  */
 public class ExpenseManager {
 
+    /** Creates a new expense manager. */
+    public ExpenseManager() {}
+
     /**
      * Adds a new expense transaction and saves it immediately.
      *
@@ -44,6 +47,13 @@ public class ExpenseManager {
       return expense;
     }
 
+    /**
+     * Finds an expense by id.
+     *
+     * @param state application state
+     * @param expenseId expense id
+     * @return expense if found, otherwise null
+     */
     public Expense findExpenseById(AppState state, long expenseId) {
       if (state == null) throw new IllegalArgumentException("state cannot be null");
       for (Expense e : state.getExpenses()) {
@@ -116,6 +126,15 @@ public class ExpenseManager {
           parseOptionalDate(toDateIso, "to date"));
     }
 
+    /**
+     * Edits an existing expense (US #8) and saves immediately.
+     *
+     * @param state application state
+     * @param expenseId expense id
+     * @param newAmount new amount (> 0)
+     * @param newCategoryId new category id (must exist)
+     * @param newNote new note (optional)
+     */
     public void editExpense(
         AppState state, long expenseId, double newAmount, int newCategoryId, String newNote) {
       if (state == null) throw new IllegalArgumentException("state cannot be null");
@@ -132,6 +151,12 @@ public class ExpenseManager {
       saveNow(state);
     }
 
+    /**
+     * Deletes an expense by id (US #8) and saves immediately.
+     *
+     * @param state application state
+     * @param expenseId expense id
+     */
     public void deleteExpense(AppState state, long expenseId) {
       if (state == null) throw new IllegalArgumentException("state cannot be null");
 
@@ -147,6 +172,13 @@ public class ExpenseManager {
       throw new IllegalArgumentException("Expense not found: " + expenseId);
     }
 
+    /**
+     * Returns whether a category id exists in the saved category list.
+     *
+     * @param state application state
+     * @param categoryId category id
+     * @return true if exists
+     */
     public boolean categoryExists(AppState state, int categoryId) {
       if (state == null) return false;
       for (Category c : state.getCategories()) {
@@ -155,6 +187,13 @@ public class ExpenseManager {
       return false;
     }
 
+    /**
+     * Resolves a category name for display.
+     *
+     * @param state application state
+     * @param categoryId category id
+     * @return category name, or \"Unknown\" if not found
+     */
     public String categoryName(AppState state, int categoryId) {
       if (state == null) return "Unknown";
       for (Category c : state.getCategories()) {
