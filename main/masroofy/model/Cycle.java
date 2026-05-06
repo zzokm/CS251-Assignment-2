@@ -16,6 +16,8 @@ public class Cycle {
   private String endDate;
   private String lastCalculatedDate;
   private boolean alert80Shown;
+  private boolean alert100Shown;
+  private boolean overspentShown;
 
   /** Creates an empty cycle (used by JSON loading). */
   public Cycle() {}
@@ -46,6 +48,8 @@ public class Cycle {
     this.endDate = endDate;
     this.lastCalculatedDate = startDate;
     this.alert80Shown = false;
+    this.alert100Shown = false;
+    this.overspentShown = false;
   }
 
   /** @return the saved cycle id */
@@ -115,6 +119,34 @@ public class Cycle {
   }
 
   /**
+   * Returns whether the budget exhausted notification was already sent for this cycle.
+   *
+   * @return true if exhausted notification already sent
+   */
+  public boolean isAlert100Shown() {
+    return alert100Shown;
+  }
+
+  /** @param alert100Shown whether the exhausted notification was already sent for this cycle */
+  public void setAlert100Shown(boolean alert100Shown) {
+    this.alert100Shown = alert100Shown;
+  }
+
+  /**
+   * Returns whether the overspent notification was already sent for this cycle.
+   *
+   * @return true if overspent notification already sent
+   */
+  public boolean isOverspentShown() {
+    return overspentShown;
+  }
+
+  /** @param overspentShown whether the overspent notification was already sent for this cycle */
+  public void setOverspentShown(boolean overspentShown) {
+    this.overspentShown = overspentShown;
+  }
+
+  /**
    * Converts this cycle to a JSON-friendly object.
    *
    * @return map containing cycle fields
@@ -127,6 +159,8 @@ public class Cycle {
     o.put("endDate", endDate);
     o.put("lastCalculatedDate", lastCalculatedDate);
     o.put("alert80Shown", alert80Shown);
+    o.put("alert100Shown", alert100Shown);
+    o.put("overspentShown", overspentShown);
     return o;
   }
 
@@ -151,6 +185,10 @@ public class Cycle {
     if (last instanceof String) c.setLastCalculatedDate((String) last);
     Object shown = o.get("alert80Shown");
     if (shown instanceof Boolean) c.setAlert80Shown((Boolean) shown);
+    Object shown100 = o.get("alert100Shown");
+    if (shown100 instanceof Boolean) c.setAlert100Shown((Boolean) shown100);
+    Object over = o.get("overspentShown");
+    if (over instanceof Boolean) c.setOverspentShown((Boolean) over);
     return c;
   }
 }
