@@ -165,9 +165,11 @@ public final class Notifications {
 
   /** Sends a cycle reset notification. */
   public boolean cycleReset(String startDateIso, String endDateIso, double allowance) {
+    String start = DateFormats.formatDisplay(DateFormats.parseFlexible(startDateIso, "Start date"));
+    String end = DateFormats.formatDisplay(DateFormats.parseFlexible(endDateIso, "End date"));
     return send(
         "Cycle reset",
-        String.format("New cycle: %s to %s (allowance %.2f)", startDateIso, endDateIso, allowance),
+        String.format("New cycle: %s to %s (allowance %.2f)", start, end, allowance),
         "3",
         "info,money");
   }

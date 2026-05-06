@@ -1,6 +1,7 @@
 package masroofy.ui;
 
 import masroofy.core.CycleManager;
+import masroofy.core.DateFormats;
 import masroofy.model.AppState;
 import masroofy.model.Cycle;
 import java.time.LocalDate;
@@ -108,9 +109,9 @@ public class SetupUI {
         case "2":
           return today.withDayOfMonth(1);
         case "3":
-          System.out.print("Custom start date (yyyy-MM-dd): ");
+          System.out.print("Custom start date (DD MM YYYY): ");
           String raw = scanner.nextLine().trim();
-          LocalDate d = LocalDate.parse(raw);
+          LocalDate d = DateFormats.parseFlexible(raw, "Start date");
           if (d.isAfter(today)) {
             System.out.println("Start date cannot be in the future.");
             continue;

@@ -6,7 +6,6 @@ import masroofy.model.Expense;
 import masroofy.storage.JsonStore;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -114,8 +113,8 @@ public class ExpenseManager {
      *
      * @param state current application state
      * @param categoryId category id to match, or {@code null} for all categories
-     * @param fromDateIso first accepted date in {@code yyyy-MM-dd}, blank/null for no lower bound
-     * @param toDateIso last accepted date in {@code yyyy-MM-dd}, blank/null for no upper bound
+     * @param fromDateIso first accepted date in {@code DD MM YYYY}, blank/null for no lower bound
+     * @param toDateIso last accepted date in {@code DD MM YYYY}, blank/null for no upper bound
      * @return matching transactions sorted descending by timestamp
      */
     public List<Expense> filterHistory(
@@ -206,9 +205,9 @@ public class ExpenseManager {
     private static LocalDate parseOptionalDate(String value, String label) {
       if (value == null || value.trim().isEmpty()) return null;
       try {
-        return LocalDate.parse(value.trim());
-      } catch (DateTimeParseException e) {
-        throw new IllegalArgumentException(label + " must use yyyy-MM-dd format.", e);
+        return DateFormats.parseFlexible(value.trim(), label);
+      } catch (IllegalArgumentException e) {
+        throw e;
       }
     }
 

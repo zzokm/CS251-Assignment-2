@@ -13,7 +13,7 @@ import java.util.Scanner;
 /** Console history screen (US #7, #8, #9). */
 public class HistoryUI {
   private static final DateTimeFormatter DATE_TIME_FORMAT =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+      DateTimeFormatter.ofPattern("dd MM uuuu HH:mm");
 
   private final ExpenseManager expenseManager;
 
@@ -53,10 +53,10 @@ public class HistoryUI {
     try {
       Integer categoryId = readOptionalCategory(scanner);
 
-      System.out.print("From date (yyyy-MM-dd, blank for any): ");
+      System.out.print("From date (DD MM YYYY, blank for any): ");
       String fromDate = scanner.nextLine().trim();
 
-      System.out.print("To date (yyyy-MM-dd, blank for any): ");
+      System.out.print("To date (DD MM YYYY, blank for any): ");
       String toDate = scanner.nextLine().trim();
 
       List<Expense> results = expenseManager.filterHistory(state, categoryId, fromDate, toDate);

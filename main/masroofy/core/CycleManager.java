@@ -6,7 +6,6 @@ import masroofy.model.Expense;
 import masroofy.storage.JsonStore;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 /** Handles budget cycle setup and cycle-based calculations. */
@@ -158,7 +157,10 @@ public class CycleManager {
   public Cycle initializeCycle(
       AppState state, double totalAllowance, String startDateIso, String endDateIso) {
     return initializeCycle(
-        state, totalAllowance, parseDate(startDateIso, "start date"), parseDate(endDateIso, "end date"));
+        state,
+        totalAllowance,
+        DateFormats.parseFlexible(startDateIso, "Start date"),
+        DateFormats.parseFlexible(endDateIso, "End date"));
   }
 
   /**
@@ -260,7 +262,7 @@ public class CycleManager {
    * @return rollover calculation result for the UI to display
    */
   public RolloverResult handleRolloverIfNeeded(AppState state, String todayIso) {
-    return handleRolloverIfNeeded(state, parseDate(todayIso, "today"));
+    return handleRolloverIfNeeded(state, DateFormats.parseFlexible(todayIso, "Today"));
   }
 
   /**
@@ -271,8 +273,8 @@ public class CycleManager {
    */
   public long getTotalCycleDays(Cycle cycle) {
     validateCycleExists(cycle);
-    LocalDate start = parseDate(cycle.getStartDate(), "start date");
-    LocalDate end = parseDate(cycle.getEndDate(), "end date");
+    LocalDate start = DateFormats.parseFlexible(cycle.getStartDate(), "Start date");
+    LocalDate end = DateFormats.parseFlexible(cycle.getEndDate(), "End date");
     validateCycleInput(cycle.getTotalAllowance(), start, end);
     return ChronoUnit.DAYS.between(start, end);
   }
@@ -288,8 +290,8 @@ public class CycleManager {
     validateCycleExists(cycle);
     if (today == null) throw new IllegalArgumentException("today cannot be null");
 
-    LocalDate start = parseDate(cycle.getStartDate(), "start date");
-    LocalDate end = parseDate(cycle.getEndDate(), "end date");
+    LocalDate start = DateFormats.parseFlexible(cycle.getStartDate(), "Start date");
+    LocalDate end = DateFormats.parseFlexible(cycle.getEndDate(), "End date");
     validateCycleInput(cycle.getTotalAllowance(), start, end);
 
     if (today.isBefore(start)) return ChronoUnit.DAYS.between(start, end);
@@ -366,17 +368,6 @@ public class CycleManager {
     }
   }
 
-  private static LocalDate parseDate(String value, String label) {
-    if (value == null || value.trim().isEmpty()) {
-      throw new IllegalArgumentException(label + " cannot be empty.");
-    }
-    try {
-      return LocalDate.parse(value.trim());
-    } catch (DateTimeParseException e) {
-      throw new IllegalArgumentException(label + " must use yyyy-MM-dd format.", e);
-    }
-  }
-
   private static void validateState(AppState state) {
     if (state == null) throw new IllegalArgumentException("state cannot be null");
   }
@@ -388,11 +379,11 @@ public class CycleManager {
   private static LocalDate getLastCalculatedDateOrStartDate(Cycle cycle) {
     String lastCalculatedDate = cycle.getLastCalculatedDate();
     if (lastCalculatedDate == null || lastCalculatedDate.trim().isEmpty()) {
-      LocalDate startDate = parseDate(cycle.getStartDate(), "start date");
+      LocalDate startDate = DateFormats.parseFlexible(cycle.getStartDate(), "Start date");
       cycle.setLastCalculatedDate(startDate.toString());
       return startDate;
     }
-    return parseDate(lastCalculatedDate, "last calculated date");
+    return DateFormats.parseFlexible(lastCalculatedDate, "Last calculated date");
   }
 
   private static void saveNow(AppState state) {
@@ -418,8 +409,8 @@ public class CycleManager {
   public void resetCycle(AppState state, double newAllowance, String startDate, String endDate) {
     validateState(state);
 
-    LocalDate start = parseDate(startDate, "start date");
-    LocalDate end = parseDate(endDate, "end date");
+    LocalDate start = DateFormats.parseFlexible(startDate, "Start date");
+    LocalDate end = DateFormats.parseFlexible(endDate, "End date");
 
     validateCycleInput(newAllowance, start, end);
 
