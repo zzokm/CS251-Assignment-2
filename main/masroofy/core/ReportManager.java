@@ -15,6 +15,8 @@ import java.util.Map;
  * total spending.
  */
 public class ReportManager {
+  /** Creates a new report manager. */
+  public ReportManager() {}
 
   /** A stable structure for the UI to print. */
   public static final class SpendingInsight {
@@ -23,6 +25,14 @@ public class ReportManager {
     private final double total;
     private final double percent;
 
+    /**
+     * Creates an insight row.
+     *
+     * @param categoryId category id
+     * @param categoryName category display name
+     * @param total total spent in that category
+     * @param percent percent share of total spending (0..100)
+     */
     public SpendingInsight(int categoryId, String categoryName, double total, double percent) {
       this.categoryId = categoryId;
       this.categoryName = categoryName;
@@ -30,18 +40,22 @@ public class ReportManager {
       this.percent = percent;
     }
 
+    /** @return category id */
     public int getCategoryId() {
       return categoryId;
     }
 
+    /** @return category name */
     public String getCategoryName() {
       return categoryName;
     }
 
+    /** @return total amount spent in this category */
     public double getTotal() {
       return total;
     }
 
+    /** @return percent share of total spending */
     public double getPercent() {
       return percent;
     }
@@ -52,6 +66,8 @@ public class ReportManager {
    *
    * <p>Percent formula: {@code percent = (categoryTotal / totalSpent) * 100}. If totalSpent is zero,
    * all percents are 0.
+   * @param state application state
+   * @return list of insight rows
    */
   public List<SpendingInsight> getSpendingInsights(AppState state) {
     if (state == null) throw new IllegalArgumentException("state cannot be null");

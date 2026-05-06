@@ -30,7 +30,13 @@ public class MenuUI {
         new SettingsUI());
   }
 
-  /** Creates the menu with injected dependencies. */
+  /**
+   * Creates the menu with injected dependencies.
+   *
+   * @param cycleManager cycle manager
+   * @param setupUI setup UI
+   * @param historyUI history UI
+   */
   public MenuUI(CycleManager cycleManager, SetupUI setupUI, HistoryUI historyUI) {
     this(
         new AuthManager(),
@@ -42,7 +48,16 @@ public class MenuUI {
         new SettingsUI());
   }
 
-  /** Creates the menu with injected dependencies. */
+  /**
+   * Creates the menu with injected dependencies.
+   *
+   * @param authManager auth manager
+   * @param cycleManager cycle manager
+   * @param expenseManager expense manager
+   * @param setupUI setup UI
+   * @param dashboardUI dashboard UI
+   * @param historyUI history UI
+   */
   public MenuUI(
       AuthManager authManager,
       CycleManager cycleManager,
@@ -53,7 +68,17 @@ public class MenuUI {
     this(authManager, cycleManager, expenseManager, setupUI, dashboardUI, historyUI, new SettingsUI());
   }
 
-  /** Creates the menu with injected dependencies. */
+  /**
+   * Creates the menu with injected dependencies.
+   *
+   * @param authManager auth manager
+   * @param cycleManager cycle manager
+   * @param expenseManager expense manager
+   * @param setupUI setup UI
+   * @param dashboardUI dashboard UI
+   * @param historyUI history UI
+   * @param settingsUI settings UI
+   */
   public MenuUI(
       AuthManager authManager,
       CycleManager cycleManager,

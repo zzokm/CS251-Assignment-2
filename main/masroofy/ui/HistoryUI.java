@@ -22,7 +22,11 @@ public class HistoryUI {
     this(new ExpenseManager());
   }
 
-  /** Creates the history screen with an injected expense manager. */
+  /**
+   * Creates the history screen with an injected expense manager.
+   *
+   * @param expenseManager expense manager
+   */
   public HistoryUI(ExpenseManager expenseManager) {
     if (expenseManager == null) throw new IllegalArgumentException("expenseManager cannot be null");
     this.expenseManager = expenseManager;

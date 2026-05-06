@@ -10,10 +10,17 @@ public class SettingsUI {
   private final AuthManager authManager;
   private final CycleManager cycleManager;
 
+  /** Creates settings UI with default managers. */
   public SettingsUI() {
     this(new AuthManager(), new CycleManager());
   }
 
+  /**
+   * Creates settings UI with injected managers.
+   *
+   * @param authManager privacy lock manager
+   * @param cycleManager cycle manager
+   */
   public SettingsUI(AuthManager authManager, CycleManager cycleManager) {
     if (authManager == null) throw new IllegalArgumentException("authManager cannot be null");
     if (cycleManager == null) throw new IllegalArgumentException("cycleManager cannot be null");

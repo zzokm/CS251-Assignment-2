@@ -2,6 +2,7 @@ package masroofy.storage;
 
 import java.nio.file.Path;
 
+/** Central file-system paths used by the application. */
 public final class Paths {
   private Paths() {}
 

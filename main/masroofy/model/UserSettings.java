@@ -16,46 +16,70 @@ public class UserSettings {
   private int failedAttempts;
   private long lockoutUntilMillis;
 
+  /** Creates default settings (privacy lock off). */
+  public UserSettings() {}
+
+  /** @return true if privacy lock is enabled */
   public boolean isPrivacyLockEnabled() {
     return privacyLockEnabled;
   }
 
+  /** @param privacyLockEnabled true to enable privacy lock */
   public void setPrivacyLockEnabled(boolean privacyLockEnabled) {
     this.privacyLockEnabled = privacyLockEnabled;
   }
 
+  /**
+   * Returns the stored salt in base64.
+   *
+   * <p>This implementation does not require a salt and typically stores null.
+   *
+   * @return salt (nullable)
+   */
   public String getPinSaltBase64() {
     return pinSaltBase64;
   }
 
+  /** @param pinSaltBase64 stored salt (nullable) */
   public void setPinSaltBase64(String pinSaltBase64) {
     this.pinSaltBase64 = pinSaltBase64;
   }
 
+  /** @return stored PIN hash hex (nullable if not set) */
   public String getPinHashHex() {
     return pinHashHex;
   }
 
+  /** @param pinHashHex stored PIN hash hex */
   public void setPinHashHex(String pinHashHex) {
     this.pinHashHex = pinHashHex;
   }
 
+  /** @return number of consecutive failed attempts */
   public int getFailedAttempts() {
     return failedAttempts;
   }
 
+  /** @param failedAttempts number of consecutive failed attempts */
   public void setFailedAttempts(int failedAttempts) {
     this.failedAttempts = Math.max(0, failedAttempts);
   }
 
+  /** @return epoch millis until which PIN entry is locked */
   public long getLockoutUntilMillis() {
     return lockoutUntilMillis;
   }
 
+  /** @param lockoutUntilMillis epoch millis until which PIN entry is locked */
   public void setLockoutUntilMillis(long lockoutUntilMillis) {
     this.lockoutUntilMillis = Math.max(0L, lockoutUntilMillis);
   }
 
+  /**
+   * Converts settings to a JSON-friendly object.
+   *
+   * @return map containing settings fields
+   */
   public Map<String, Object> toJsonObject() {
     Map<String, Object> o = new LinkedHashMap<>();
     o.put("privacyLockEnabled", privacyLockEnabled);
@@ -66,6 +90,12 @@ public class UserSettings {
     return o;
   }
 
+  /**
+   * Builds settings from a JSON-friendly object.
+   *
+   * @param o parsed JSON object map
+   * @return settings
+   */
   public static UserSettings fromJsonObject(Map<String, Object> o) {
     UserSettings s = new UserSettings();
     if (o == null) return s;
