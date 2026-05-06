@@ -14,6 +14,8 @@ public class CycleManager {
   /** Creates a new cycle manager. */
   public CycleManager() {}
 
+  private final Notifications notifications = new Notifications();
+
   /** Result returned from threshold checks (US #6). */
   public static final class ThresholdResult {
     private final boolean budgetExhausted;
@@ -242,6 +244,11 @@ public class CycleManager {
     }
 
     double remainingBalance = calculateRemainingBalance(state);
+    if (remainingBalance < 0.0 && !cycle.isOverspentShown()) {
+      cycle.setOverspentShown(true);
+      saveNow(state);
+      notifications.overspent(remainingBalance);
+    }
     long remainingDays = getRemainingDays(cycle, today);
     double safeDailyLimit = remainingBalance / remainingDays;
     return new RolloverResult(shouldApply, remainingBalance, remainingDays, safeDailyLimit);
@@ -333,6 +340,13 @@ public class CycleManager {
       show80 = true;
       cycle.setAlert80Shown(true);
       saveNow(state);
+      notifications.budget80(allowance, spent);
+    }
+
+    if (exhausted && !cycle.isAlert100Shown()) {
+      cycle.setAlert100Shown(true);
+      saveNow(state);
+      notifications.budgetExhausted(allowance, spent);
     }
 
     return new ThresholdResult(exhausted, show80);
@@ -427,6 +441,7 @@ public class CycleManager {
     state.setActiveCycle(newCycle);
 
     saveNow(state);
+    notifications.cycleReset(startDate, endDate, newAllowance);
   }
 
   /**
@@ -443,6 +458,7 @@ public class CycleManager {
     state.getExpenses().clear();
     state.setNextExpenseId(1L);
     saveNow(state);
+    notifications.send("Cycle reset", "Cycle was cleared (no active cycle).", "3", "info,money");
   }
 
 

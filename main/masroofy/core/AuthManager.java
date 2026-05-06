@@ -27,6 +27,8 @@ public class AuthManager {
   /** Creates a new auth manager. */
   public AuthManager() {}
 
+  private final Notifications notifications = new Notifications();
+
   /**
    * Returns whether privacy lock is enabled in settings.
    *
@@ -134,7 +136,9 @@ public class AuthManager {
     int next = s.getFailedAttempts() + 1;
     s.setFailedAttempts(next);
     if (next >= MAX_FAILED_ATTEMPTS) {
-      s.setLockoutUntilMillis(now + LOCKOUT_WINDOW_MILLIS);
+      long until = now + LOCKOUT_WINDOW_MILLIS;
+      s.setLockoutUntilMillis(until);
+      notifications.pinLockout(LOCKOUT_WINDOW_MILLIS / 1000L);
     }
     saveNow(state);
     return false;
