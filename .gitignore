@@ -12,6 +12,9 @@ generated-docs/
 # Runtime data (local SQLite database)
 data/
 
+# Team docs (local only, not pushed to remote)
+docs/
+
 # OS / editor / IDE files
 .DS_Store
 Thumbs.db
