@@ -1,6 +1,6 @@
 # Masroofy
 
-**Masroofy** is a Java console budget-management application for CS251 Assignment 2. It helps you set a spending cycle, log expenses, track a safe daily limit, view category breakdowns, and keep all data stored locally in SQLite—no internet required.
+**Masroofy** is a Java console budget-management application for CS251 Assignment 2. It helps you set a spending cycle, log expenses, track a safe daily limit, view category breakdowns, and keep all data stored locally in SQLite, no internet required.
 
 ## Team
 
