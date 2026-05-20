@@ -9,7 +9,6 @@ public final class Paths {
   /** Project runtime data directory (created automatically). */
   public static final Path DATA_DIR = Path.of("data");
 
-  /** Main persisted state file for the whole application. */
-  public static final Path APP_STATE_JSON = DATA_DIR.resolve("app-state.json");
+  /** SQLite database file for all persisted application state. */
+  public static final Path APP_DB = DATA_DIR.resolve("masroofy.db");
 }
-
