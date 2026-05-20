@@ -1,10 +1,10 @@
-# WORK_ALLOCATION.md — Team S26 (Masroofy, Java Console, JSON)
+# WORK_ALLOCATION.md — Team S26 (Masroofy, Java Console, SQLite)
 
 This file assigns **exact implementation responsibilities** per member based on the 12 SRS user stories in `docs/Masroofy_SRS.md`.
 
 **Global rules (everyone must follow):**
 
-- **Persistence**: JSON-only (`data/app-state.json`). Any change must be saved immediately.
+- **Persistence**: SQLite-only (`data/masroofy.db`). Any change must be saved immediately via `DatabaseHelper.saveState`.
 - **Traceability**: each user story must map to sequence diagrams in `docs/Masroofy_SDS_Full.md` / `diagrams/DIAGRAMS.md` and to real code method names (Class–Sequence Usage Table).
 - **Javadoc**: every class and every public method must have meaningful Javadoc.
 - **Deadline focus**: implement the simplest console flows that satisfy acceptance criteria; avoid optional refactors.
@@ -16,11 +16,11 @@ This file assigns **exact implementation responsibilities** per member based on 
 
 These are “platform” tasks that unblock all user stories. Assign one person to implement, others review quickly.
 
-- **JSON store + state model**
+- **SQLite store + state model**
   - Create `AppState` containing: active cycle, expenses list, categories list, settings, and flags (e.g., “80% alert shown”).
-  - Create `JsonStore` with:
-    - `load()` (if missing → first run)
-    - `save(AppState)` (write temp then atomic rename)
+  - Create `DatabaseHelper` with:
+    - `loadState()` (if empty → first run)
+    - `saveState(AppState)` (transactional full-state save to `data/masroofy.db`)
 - **Category seed**
   - Ensure default categories exist on first run (Food, Transport, Bills, etc.).
 
@@ -59,7 +59,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
     - safe daily limit
     - thresholds (80% warning)
 - **Persistence touchpoints**
-  - Save JSON immediately after edit/delete.
+  - Save SQLite immediately after edit/delete.
 - **Traceability deliverables**
   - Add sequence diagram(s) for Edit/Delete (can be one diagram with `alt`).
   - Update Class–Sequence table entries.
@@ -104,7 +104,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
     - `logExpense(amount, categoryId, timestamp, note)`
   - After add: recompute daily limit and update dashboard view model.
 - **Persistence touchpoints**
-  - Append to `AppState.expenses`, then save JSON immediately.
+  - Append to `AppState.expenses`, then save SQLite immediately.
 - **Traceability deliverables**
   - Ensure existing “Log Expense” sequence diagram matches final class/method names.
   - Update Class–Sequence table with exact names + code location.
@@ -122,7 +122,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
     - totalSpent / initialAllowance
   - Track “alert already shown” in `AppState` (per active cycle).
 - **Persistence touchpoints**
-  - Save JSON when alert flags change.
+  - Save SQLite when alert flags change.
 - **Traceability deliverables**
   - Update existing threshold sequence diagram to include “already alerted” flag storage (or add a small extension).
   - Update Class–Sequence table.
@@ -134,7 +134,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 ### US #10 — Offline Local Data Persistence (console interpretation)
 - **What “offline” means here**
   - No network dependencies.
-  - All actions work using only JSON local files.
+  - All actions work using only SQLite local files.
   - Restart restores state accurately.
 - **Implementation tasks**
   - Ensure startup loads `AppState` and restores:
@@ -206,7 +206,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
   - Keep categories and privacy settings decision consistent:
     - Recommended: keep categories; keep privacy lock setting unless SRS implies otherwise.
 - **Persistence touchpoints**
-  - Save JSON immediately after reset.
+  - Save SQLite immediately after reset.
 - **Traceability deliverables**
   - Add a sequence diagram for “Reset cycle” (currently missing/mislabeled in SDS).
   - Update Class–Sequence table (and fix US numbering mismatch in SDS if needed).
@@ -229,7 +229,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
     - compute initial safe daily limit
     - route to dashboard
 - **Persistence touchpoints**
-  - Save cycle into `AppState.cycle` and write JSON.
+  - Save cycle into `AppState.cycle` and write SQLite.
 - **Traceability deliverables**
   - Ensure existing setup sequence diagram matches final names or update it.
   - Update Class–Sequence table.
@@ -249,7 +249,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
     - recompute safe daily limit using remaining balance and remaining days.
   - Overspending case reduces limit (print a warning message).
 - **Persistence touchpoints**
-  - Store lastCalculatedDate in `AppState` and save JSON after update.
+  - Store lastCalculatedDate in `AppState` and save SQLite after update.
 - **Traceability deliverables**
   - Update existing rollover diagram to match console trigger (on app open).
   - Update Class–Sequence table.
@@ -281,7 +281,7 @@ These are “platform” tasks that unblock all user stories. Assign one person 
 
 - Recurring expenses (daily/weekly/monthly) with auto-generation at app start.
 - Category budgets + per-category alerts.
-- Export/import (CSV/JSON) + backup/restore `data/app-state.json`.
+- Export/import (CSV/JSON) + backup/restore `data/masroofy.db`.
 - Advanced analytics (avg daily spend, projections, trends, top categories).
 - Multi-cycle history (keep past cycles instead of deleting; browse old cycles).
 - Stronger PIN security (salted hash, configurable lockout).

@@ -37,7 +37,7 @@ This file is the **team’s detailed implementation task plan** derived from:
 This is the **minimum plan** that still satisfies the assignment (12 US + persistence + traceability + Javadoc).
 
 - **Day 1 (ship core app)**:
-  - Implement **JSON persistence** (`AppState` + `JsonStore`) + startup load/save.
+  - Implement **SQLite persistence** (`AppState` + `DatabaseHelper`) + startup load/save.
   - Implement flows for **US #1, #2, #7, #8, #9, #11, #12** (these are the “must-demo” operations).
   - Ensure dashboard always shows safe daily limit (covers **US #3**) and category breakdown (covers **US #4**).
   - Implement rollover check on app start/refresh (covers **US #5**) and threshold warnings (covers **US #6**).
@@ -78,19 +78,19 @@ Even though SDS mentions “UI screens”, in a console app we implement the sam
 - **Model / Domain**: entities + business rules (cycle, expense, category, settings).
 - **Persistence**: repository/DAO layer + database/file adapter.
 
-### 2.1 Persistence decision (FINAL): JSON files (100%)
+### 2.1 Persistence decision (FINAL): SQLite (100%)
 
-To reduce risk/complexity and ship within 2 days, we will use **file-based JSON persistence** (no database).
+All application data is stored in a local **SQLite** database (`data/masroofy.db`), aligned with the SRS/SDS design.
 
-**Why JSON (over .txt):**
+**Why SQLite:**
 
-- Human-readable and easy to debug.
-- No custom parsing rules (unlike ad-hoc `.txt` formats).
-- Simple to load/save whole app state at once.
+- Matches the documented `DatabaseHelper` architecture in the SDS.
+- Reliable transactional persistence with a single database file.
+- No custom JSON parsing or ad-hoc file formats.
 
-**Implementation rule:** after any state-changing operation, save JSON immediately so the app always restarts correctly.
+**Implementation rule:** after any state-changing operation, call `DatabaseHelper.saveState(state)` immediately so the app always restarts correctly.
 
-**Library choice:** use a JSON library (Gson or Jackson) to serialize/deserialize POJOs.
+**Dependency:** `lib/sqlite-jdbc.jar` (org.xerial sqlite-jdbc) on the compile/run classpath.
 
 ---
 
@@ -98,7 +98,7 @@ To reduce risk/complexity and ship within 2 days, we will use **file-based JSON 
 
 Keep packages aligned with responsibilities so the TA can find diagram interactions quickly.
 
-**Folder convention:** keep the Java package root at `main/masroofy/` and use a simple structure: `ui/` (console I/O), `core/` (use-cases), `model/` (POJOs), `storage/` (JSON).
+**Folder convention:** keep the Java package root at `main/masroofy/` and use a simple structure: `ui/` (console I/O), `core/` (use-cases), `model/` (POJOs), `storage/` (SQLite).
 
 ```
 Masroofy/
@@ -107,7 +107,8 @@ Masroofy/
 ├─ WORK_ALLOCATION.md
 ├─ docs/                         # given docs (SRS/SDS/assignment)
 ├─ diagrams/                     # given diagrams + exports
-├─ data/                         # runtime JSON persistence (created on first run)
+├─ data/                         # runtime SQLite database (created on first run)
+├─ lib/                          # sqlite-jdbc.jar
 ├─ main/
 │  └─ masroofy/
 │     ├─ Main.java
@@ -129,7 +130,7 @@ Masroofy/
 │     │  ├─ Expense.java
 │     │  └─ UserSettings.java
 │     └─ storage/
-│        ├─ JsonStore.java
+│        ├─ DatabaseHelper.java
 │        └─ Paths.java
 └─ generated-docs/               # output of Javadoc (HTML) to include in submission zip
 ```
@@ -155,28 +156,23 @@ Masroofy/
 - **UserSettings**
   - `privacyLockEnabled`, `pinHash`, optional `failedAttempts`, `lockoutUntil`
 
-### 4.2 SQLite tables (draft)
+### 4.2 SQLite schema (FINAL)
 
-### 4.2 JSON persistence files (FINAL)
+Database file: `data/masroofy.db` (created on first run).
 
-Store everything under a single folder (commonly `data/`).
+Tables (managed by `DatabaseHelper`):
 
-- `data/app-state.json` (recommended single-file approach)
-  - Contains: active cycle, expenses list, categories list, settings, and any flags needed (e.g., “80% alert shown”).
-
-Alternative (acceptable, but more files to manage):
-
-- `data/cycle.json`
-- `data/expenses.json`
-- `data/categories.json`
-- `data/settings.json`
+- `app_meta` — key/value store (`next_expense_id`)
+- `cycles` — active budget cycle and alert flags
+- `categories` — category id + name
+- `expenses` — all transactions
+- `user_settings` — privacy lock, PIN hash, lockout, ntfy suffix
 
 ### 4.3 Persistence behavior requirements
 
-- **Startup**: load JSON state; if no state exists, treat as first run (go to setup flow).
-- **After any change** (add/edit/delete expense, reset cycle, enable lock): persist immediately.
-- **Data integrity (simple approach)**:
-  - Write to a temp file then rename (atomic replace) to reduce corruption risk.
+- **Startup**: `DatabaseHelper.loadState()`; if empty, treat as first run (go to setup flow).
+- **After any change** (add/edit/delete expense, reset cycle, enable lock): `DatabaseHelper.saveState(state)` immediately.
+- **Data integrity**: full-state save inside a single SQLite transaction.
 
 ---
 
@@ -321,7 +317,7 @@ Console-friendly equivalent (since no UI charts):
   - Show “no results” message when empty
 - **Controller/Service**
   - `ExpenseController.filterHistory(cycleId, categoryId?, fromDate?, toDate?)`
-  - Repository filters in-memory (read from JSON) using Java predicates and date comparisons
+  - Repository filters in-memory (read from SQLite-loaded state) using Java predicates and date comparisons
 - **Sequence diagram requirement**
   - Current “View History & Filters” diagram exists; ensure it supports date range too
 
@@ -331,7 +327,7 @@ In console terms, “offline” means:
 
 - No network dependencies at all
 - Works fully using local SQLite/file storage
-- Works fully using local JSON file storage
+- Works fully using local SQLite database storage
 - Startup restores state correctly
 
 Tasks:
