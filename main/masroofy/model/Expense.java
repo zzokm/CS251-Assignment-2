@@ -3,8 +3,6 @@ package masroofy.model;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * A single spending transaction.
@@ -18,7 +16,7 @@ public class Expense {
   private long timestampMillis;
   private String note;
 
-  /** Creates an empty expense (used by JSON loading). */
+  /** Creates an empty expense (used when loading from the database). */
   public Expense() {}
 
   /**
@@ -121,42 +119,4 @@ public class Expense {
     if (toDate != null && transactionDate.isAfter(toDate)) return false;
     return true;
   }
-
-  /**
-   * Converts this expense to a JSON-friendly object.
-   *
-   * @return map containing fields
-   */
-  public Map<String, Object> toJsonObject() {
-    Map<String, Object> o = new LinkedHashMap<>();
-    o.put("id", id);
-    o.put("categoryId", categoryId);
-    o.put("amount", amount);
-    o.put("timestampMillis", timestampMillis);
-    o.put("note", note);
-    return o;
-  }
-
-  /**
-   * Builds an expense from a JSON-friendly object.
-   *
-   * @param o parsed JSON object map
-   * @return expense
-   */
-  public static Expense fromJsonObject(Map<String, Object> o) {
-    Expense e = new Expense();
-    if (o == null) return e;
-    Object id = o.get("id");
-    if (id instanceof Number) e.setId(((Number) id).longValue());
-    Object cat = o.get("categoryId");
-    if (cat instanceof Number) e.setCategoryId(((Number) cat).intValue());
-    Object amt = o.get("amount");
-    if (amt instanceof Number) e.setAmount(((Number) amt).doubleValue());
-    Object ts = o.get("timestampMillis");
-    if (ts instanceof Number) e.setTimestampMillis(((Number) ts).longValue());
-    Object note = o.get("note");
-    if (note instanceof String) e.setNote((String) note);
-    return e;
-  }
 }
-

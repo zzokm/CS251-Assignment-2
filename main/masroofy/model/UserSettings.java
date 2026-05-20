@@ -1,8 +1,5 @@
 package masroofy.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * User settings persisted in {@link AppState}.
  *
@@ -93,45 +90,4 @@ public class UserSettings {
   public void setNtfyTopicSuffix(String ntfyTopicSuffix) {
     this.ntfyTopicSuffix = ntfyTopicSuffix;
   }
-
-  /**
-   * Converts settings to a JSON-friendly object.
-   *
-   * @return map containing settings fields
-   */
-  public Map<String, Object> toJsonObject() {
-    Map<String, Object> o = new LinkedHashMap<>();
-    o.put("privacyLockEnabled", privacyLockEnabled);
-    o.put("pinSaltBase64", pinSaltBase64);
-    o.put("pinHashHex", pinHashHex);
-    o.put("failedAttempts", failedAttempts);
-    o.put("lockoutUntilMillis", lockoutUntilMillis);
-    o.put("ntfyTopicSuffix", ntfyTopicSuffix);
-    return o;
-  }
-
-  /**
-   * Builds settings from a JSON-friendly object.
-   *
-   * @param o parsed JSON object map
-   * @return settings
-   */
-  public static UserSettings fromJsonObject(Map<String, Object> o) {
-    UserSettings s = new UserSettings();
-    if (o == null) return s;
-    Object en = o.get("privacyLockEnabled");
-    if (en instanceof Boolean) s.setPrivacyLockEnabled((Boolean) en);
-    Object salt = o.get("pinSaltBase64");
-    if (salt instanceof String) s.setPinSaltBase64((String) salt);
-    Object hash = o.get("pinHashHex");
-    if (hash instanceof String) s.setPinHashHex((String) hash);
-    Object fa = o.get("failedAttempts");
-    if (fa instanceof Number) s.setFailedAttempts(((Number) fa).intValue());
-    Object lo = o.get("lockoutUntilMillis");
-    if (lo instanceof Number) s.setLockoutUntilMillis(((Number) lo).longValue());
-    Object suf = o.get("ntfyTopicSuffix");
-    if (suf instanceof String) s.setNtfyTopicSuffix((String) suf);
-    return s;
-  }
 }
-

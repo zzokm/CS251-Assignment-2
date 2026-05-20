@@ -1,13 +1,10 @@
 package masroofy.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
- * Budget cycle metadata saved in JSON.
+ * Budget cycle metadata persisted in SQLite.
  *
  * <p>US #1 needs the total allowance plus a start and end date. Dates are stored as ISO strings
- * ({@code yyyy-MM-dd}) so the JSON file stays simple and readable.
+ * ({@code yyyy-MM-dd}) in the database.
  */
 public class Cycle {
   private long id;
@@ -19,7 +16,7 @@ public class Cycle {
   private boolean alert100Shown;
   private boolean overspentShown;
 
-  /** Creates an empty cycle (used by JSON loading). */
+  /** Creates an empty cycle (used when loading from the database). */
   public Cycle() {}
 
   /**
@@ -105,7 +102,7 @@ public class Cycle {
   /**
    * Returns whether the 80% warning was already shown for this cycle (US #6).
    *
-   * <p>This is saved in JSON to avoid spamming the user with repeated warnings.
+   * <p>Persisted in SQLite to avoid spamming the user with repeated warnings.
    *
    * @return true if warning already shown
    */
@@ -145,51 +142,4 @@ public class Cycle {
   public void setOverspentShown(boolean overspentShown) {
     this.overspentShown = overspentShown;
   }
-
-  /**
-   * Converts this cycle to a JSON-friendly object.
-   *
-   * @return map containing cycle fields
-   */
-  public Map<String, Object> toJsonObject() {
-    Map<String, Object> o = new LinkedHashMap<>();
-    o.put("id", id);
-    o.put("totalAllowance", totalAllowance);
-    o.put("startDate", startDate);
-    o.put("endDate", endDate);
-    o.put("lastCalculatedDate", lastCalculatedDate);
-    o.put("alert80Shown", alert80Shown);
-    o.put("alert100Shown", alert100Shown);
-    o.put("overspentShown", overspentShown);
-    return o;
-  }
-
-  /**
-   * Creates a cycle from a JSON-friendly object.
-   *
-   * @param o parsed JSON object map
-   * @return cycle
-   */
-  public static Cycle fromJsonObject(Map<String, Object> o) {
-    Cycle c = new Cycle();
-    if (o == null) return c;
-    Object id = o.get("id");
-    if (id instanceof Number) c.setId(((Number) id).longValue());
-    Object t = o.get("totalAllowance");
-    if (t instanceof Number) c.setTotalAllowance(((Number) t).doubleValue());
-    Object start = o.get("startDate");
-    if (start instanceof String) c.setStartDate((String) start);
-    Object end = o.get("endDate");
-    if (end instanceof String) c.setEndDate((String) end);
-    Object last = o.get("lastCalculatedDate");
-    if (last instanceof String) c.setLastCalculatedDate((String) last);
-    Object shown = o.get("alert80Shown");
-    if (shown instanceof Boolean) c.setAlert80Shown((Boolean) shown);
-    Object shown100 = o.get("alert100Shown");
-    if (shown100 instanceof Boolean) c.setAlert100Shown((Boolean) shown100);
-    Object over = o.get("overspentShown");
-    if (over instanceof Boolean) c.setOverspentShown((Boolean) over);
-    return c;
-  }
 }
-

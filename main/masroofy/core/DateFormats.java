@@ -36,7 +36,7 @@ public final class DateFormats {
 
     String s = raw.trim();
 
-    // Backward compatibility: existing persisted JSON uses ISO yyyy-MM-dd.
+    // Backward compatibility: persisted cycle dates use ISO yyyy-MM-dd.
     if (s.matches("\\d{4}-\\d{2}-\\d{2}")) {
       return LocalDate.parse(s);
     }

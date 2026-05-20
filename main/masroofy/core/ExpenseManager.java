@@ -3,8 +3,8 @@ package masroofy.core;
 import masroofy.model.AppState;
 import masroofy.model.Category;
 import masroofy.model.Expense;
-import masroofy.storage.JsonStore;
-import java.io.IOException;
+import masroofy.storage.DatabaseHelper;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Expense operations used by history flows (US #2, #7, #8, #9).
  *
- * <p>Persistence rule: any add/edit/delete is saved immediately to JSON.
+ * <p>Persistence rule: any add/edit/delete is saved immediately to SQLite.
  */
 public class ExpenseManager {
 
@@ -218,8 +218,8 @@ public class ExpenseManager {
 
     private static void saveNow(AppState state) {
       try {
-        JsonStore.saveState(state);
-      } catch (IOException e) {
+        DatabaseHelper.saveState(state);
+      } catch (SQLException e) {
         throw new IllegalStateException("Failed to save state", e);
       }
     }

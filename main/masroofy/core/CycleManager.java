@@ -3,8 +3,8 @@ package masroofy.core;
 import masroofy.model.AppState;
 import masroofy.model.Cycle;
 import masroofy.model.Expense;
-import masroofy.storage.JsonStore;
-import java.io.IOException;
+import masroofy.storage.DatabaseHelper;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -388,8 +388,8 @@ public class CycleManager {
 
   private static void saveNow(AppState state) {
     try {
-      JsonStore.saveState(state);
-    } catch (IOException e) {
+      DatabaseHelper.saveState(state);
+    } catch (SQLException e) {
       throw new IllegalStateException("Failed to save state", e);
     }
   }

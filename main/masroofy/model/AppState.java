@@ -1,15 +1,13 @@
 package masroofy.model;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Root persisted state of the application.
  *
- * <p>This object is stored fully in {@code data/app-state.json}. Any state-changing operation should
- * save immediately after updating this object.
+ * <p>This object is stored in {@code data/masroofy.db}. Any state-changing operation should save
+ * immediately after updating this object.
  */
 public class AppState {
   private Cycle activeCycle;
@@ -138,84 +136,4 @@ public class AppState {
     categories.add(new Category(5, "Entertainment"));
     categories.add(new Category(6, "Other"));
   }
-
-  /**
-   * Converts this state to a JSON-friendly object graph (Maps/Lists/primitive values).
-   *
-   * @return JSON root object map
-   */
-  public Map<String, Object> toJsonObject() {
-    Map<String, Object> root = new LinkedHashMap<>();
-    root.put("nextExpenseId", nextExpenseId);
-    root.put("activeCycle", (activeCycle == null) ? null : activeCycle.toJsonObject());
-
-    List<Object> exp = new ArrayList<>();
-    for (Expense e : expenses) exp.add(e.toJsonObject());
-    root.put("expenses", exp);
-
-    List<Object> cats = new ArrayList<>();
-    for (Category c : categories) cats.add(c.toJsonObject());
-    root.put("categories", cats);
-
-    root.put("settings", (settings == null) ? null : settings.toJsonObject());
-    return root;
-  }
-
-  /**
-   * Parses state from a JSON root object map.
-   *
-   * @param root parsed JSON root (object)
-   * @return application state
-   */
-  public static AppState fromJsonObject(Map<String, Object> root) {
-    AppState s = new AppState();
-    if (root == null) return s;
-
-    Object nId = root.get("nextExpenseId");
-    if (nId instanceof Number) s.setNextExpenseId(((Number) nId).longValue());
-
-    Object c = root.get("activeCycle");
-    if (c instanceof Map) {
-      @SuppressWarnings("unchecked")
-      Map<String, Object> cm = (Map<String, Object>) c;
-      s.setActiveCycle(Cycle.fromJsonObject(cm));
-    }
-
-    Object exps = root.get("expenses");
-    if (exps instanceof List) {
-      List<Expense> list = new ArrayList<>();
-      for (Object o : (List<?>) exps) {
-        if (o instanceof Map) {
-          @SuppressWarnings("unchecked")
-          Map<String, Object> em = (Map<String, Object>) o;
-          list.add(Expense.fromJsonObject(em));
-        }
-      }
-      s.setExpenses(list);
-    }
-
-    Object cats = root.get("categories");
-    if (cats instanceof List) {
-      List<Category> list = new ArrayList<>();
-      for (Object o : (List<?>) cats) {
-        if (o instanceof Map) {
-          @SuppressWarnings("unchecked")
-          Map<String, Object> cm = (Map<String, Object>) o;
-          list.add(Category.fromJsonObject(cm));
-        }
-      }
-      s.setCategories(list);
-    }
-
-    Object set = root.get("settings");
-    if (set instanceof Map) {
-      @SuppressWarnings("unchecked")
-      Map<String, Object> sm = (Map<String, Object>) set;
-      s.setSettings(UserSettings.fromJsonObject(sm));
-    }
-
-    s.ensureSeedCategories();
-    return s;
-  }
 }
-

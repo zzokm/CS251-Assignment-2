@@ -1,9 +1,9 @@
 package masroofy;
 
 import masroofy.model.AppState;
-import masroofy.storage.JsonStore;
+import masroofy.storage.DatabaseHelper;
 import masroofy.ui.MenuUI;
-import java.io.IOException;
+import java.sql.SQLException;
 
 /** Application entry point. Loads persisted state and starts the console UI. */
 public class Main {
@@ -14,11 +14,11 @@ public class Main {
    * Program entry point.
    *
    * @param args ignored
-   * @throws IOException if reading or writing the persisted JSON fails
+   * @throws SQLException if reading or writing the SQLite database fails
    */
-  public static void main(String[] args) throws IOException {
-    AppState state = JsonStore.loadState();
-    JsonStore.saveState(state);
+  public static void main(String[] args) throws SQLException {
+    AppState state = DatabaseHelper.loadState();
+    DatabaseHelper.saveState(state);
     MenuUI menu = new MenuUI();
     menu.start(state);
   }

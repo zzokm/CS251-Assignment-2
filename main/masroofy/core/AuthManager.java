@@ -2,8 +2,8 @@ package masroofy.core;
 
 import masroofy.model.AppState;
 import masroofy.model.UserSettings;
-import masroofy.storage.JsonStore;
-import java.io.IOException;
+import masroofy.storage.DatabaseHelper;
+import java.sql.SQLException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
@@ -162,8 +162,8 @@ public class AuthManager {
 
   private static void saveNow(AppState state) {
     try {
-      JsonStore.saveState(state);
-    } catch (IOException e) {
+      DatabaseHelper.saveState(state);
+    } catch (SQLException e) {
       throw new IllegalStateException("Failed to save state", e);
     }
   }

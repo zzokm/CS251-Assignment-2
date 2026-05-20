@@ -2,7 +2,7 @@ package masroofy.core;
 
 import masroofy.model.AppState;
 import masroofy.model.UserSettings;
-import masroofy.storage.JsonStore;
+import masroofy.storage.DatabaseHelper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -220,7 +220,7 @@ public final class Notifications {
     String suffix = computeMachineSuffix();
     s.setNtfyTopicSuffix(suffix);
     try {
-      JsonStore.saveState(state);
+      DatabaseHelper.saveState(state);
     } catch (Exception e) {
       // Best-effort: if saving fails, still return a stable suffix.
       System.err.println("Failed to persist ntfy topic suffix: " + e.getMessage());
