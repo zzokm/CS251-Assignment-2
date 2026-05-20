@@ -58,8 +58,7 @@ main/masroofy/
 data/masroofy.db       # Runtime database (created locally, gitignored)
 lib/sqlite-jdbc.jar    # SQLite JDBC driver
 scripts/run.ps1        # Compile and run helper
-docs/                  # SRS, SDS, task plan, file map
-documentation/         # Generated Javadoc HTML
+documentation/         # Generated Javadoc HTML (in repo)
 ```
 
 ## Persistence
@@ -73,13 +72,15 @@ The `data/` folder is gitignored so each machine keeps its own database.
 
 ## Documentation
 
+API documentation is included in this repository:
+
 | Resource | Location |
 |----------|----------|
-| Implementation plan | `docs/TASK.md` |
-| File map & user-story flow | `docs/File_Map_and_Orchestration.md` |
-| Work allocation | `docs/WORK_ALLOCATION.md` |
-| SRS / SDS | `docs/Masroofy_SRS.md`, `docs/Masroofy_SDS_Full.md` |
-| Generated API docs | `documentation/index.html` |
+| Generated API docs (Javadoc) | [`documentation/index.html`](documentation/index.html) |
+
+Open `documentation/index.html` in a browser after cloning, or browse the HTML files on GitHub.
+
+Team planning files (SRS, SDS, task plan, diagrams) live in a local `docs/` folder that is **not** pushed to GitHub. Each teammate should keep their own copy from the team drive or shared files.
 
 ### Regenerate Javadoc
 
