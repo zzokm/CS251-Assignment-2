@@ -4,7 +4,14 @@
     {
       "label": "Java: Run Masroofy",
       "type": "shell",
-      "command": "javac (Get-ChildItem -Recurse -Filter *.java -Path main | ForEach-Object FullName); java -cp main masroofy.Main",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/run.ps1"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -12,8 +19,12 @@
       "group": {
         "kind": "build",
         "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
       }
     }
   ]
 }
-

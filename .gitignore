@@ -9,7 +9,7 @@ target/
 # Generated docs
 generated-docs/
 
-# Runtime data (local persistence)
+# Runtime data (local SQLite database)
 data/
 
 # OS / editor / IDE files
